@@ -1,0 +1,167 @@
+{
+  "nav": {
+    "features": "Exceptional Features",
+    "pricing": "Investment Plans",
+    "dashboard": "Smart Dashboard",
+    "requestDemo": "Claim Your Copy"
+  },
+  "hero": {
+    "badge": "🔥 Special Offer for the First 20 Real Estate Agencies Only",
+    "title": "Double Your Real Estate Deals in 30 Days... Or Your Money Back!",
+    "subtitle": "An all-in-one AI system that replaces 3 marketers and sales reps: replies to clients on WhatsApp in under a second, qualifies them by budget, and books viewings 24/7.",
+    "ctaPrimary": "Claim Launch Pricing Now",
+    "ctaSecondary": "See How It Works",
+    "stats": {
+      "agencies": "3x Faster Response Rate",
+      "leads": "Zero Lost Leads",
+      "markets": "ROI Within One Week"
+    }
+  },
+  "features": {
+    "title": "Why You Will Crush Your Competitors With Our System",
+    "subtitle": "We don’t just sell you software; we deploy a non-stop sales machine working 24/7 for your agency.",
+    "leadQualifier": {
+      "title": "AI Lead Qualifier",
+      "description": "Filters out lookie-loos from real buyers, asking about budgets, preferred locations, and timelines with pinpoint accuracy."
+    },
+    "omnichannel": {
+      "title": "Unified Omnichannel Inbox",
+      "description": "Integrate WhatsApp, email, and social platforms into one place so no client waits more than a second for a reply."
+    },
+    "ragBot": {
+      "title": "Custom Property Catalog Bot",
+      "description": "Upload your property documents (PDFs, pricing sheets), and the bot answers visitors with 100% accurate, hallucination-free data."
+    },
+    "ocr": {
+      "title": "Instant Document Verification",
+      "description": "AI-powered vision OCR for ID cards and title deeds to accelerate compliance and deal-closing workflows."
+    },
+    "multilingual": {
+      "title": "Gulf & Global Market Ready",
+      "description": "Native Arabic dialects and fluent English support with full RTL/LTR layout switching."
+    },
+    "multiTenant": {
+      "title": "Complete Independence & Branding",
+      "description": "Dedicated workspaces for every agency with custom branding, independent links, and unique communication channels."
+    }
+  },
+  "pricing": {
+    "title": "Choose Your Agency's Growth Plan",
+    "subtitle": "A tiny investment that pays for itself many times over with a single closed deal.",
+    "marketValue": {
+      "starter": "250,000 DZD",
+      "growth": "400,000 DZD"
+    },
+    "setupLabel": "One-time setup fee",
+    "monthlyLabel": "Monthly retainer",
+    "plans": {
+      "starter": {
+        "name": "Fast-Track Starter",
+        "setupPrice": "80,000 DZD",
+        "monthlyPrice": "30,000 DZD",
+        "period": "monthly",
+        "badge": "Most Popular for New Offices",
+        "valueStack": [
+          "AI Auto-Reply Assistant (WhatsApp & Web)",
+          "Automatic qualification of 500 leads/mo",
+          "Instant Google Sheets & N8N automation",
+          "Direct email technical support"
+        ],
+        "cta": "Start Now"
+      },
+      "growth": {
+        "name": "Scale & Dominate",
+        "setupPrice": "120,000 DZD",
+        "monthlyPrice": "50,000 DZD",
+        "period": "monthly",
+        "badge": "Highest Value & ROI",
+        "valueStack": [
+          "All Starter Plan features",
+          "Unlimited leads and client conversations",
+          "Custom RAG Bot for your full property catalog",
+          "Omnichannel integration (WhatsApp + Email + SMS)",
+          "AI Lead Scoring & Qualification",
+          "Dedicated account manager & free setup",
+          "15-day money-back guarantee"
+        ],
+        "cta": "Dominate Your Market"
+      },
+      "enterprise": {
+        "name": "Elite Agency (VIP)",
+        "setupPrice": "Custom",
+        "monthlyPrice": "Custom",
+        "period": "monthly",
+        "badge": "Tailored for Top Brokers",
+        "valueStack": [
+          "All Growth Plan features",
+          "Fully customized AI trained on your brand tone",
+          "Advanced N8N & custom CRM workflows",
+          "Free sales team onboarding and training",
+          "30-day money-back guarantee"
+        ],
+        "cta": "Join Elite Agencies"
+      }
+    }
+  },
+  "cta": {
+    "title": "Ready to Multiply Your Agency's Profits?",
+    "subtitle": "Don't let competitors beat you to AI adoption. Claim your spot before launch pricing slots fill up.",
+    "button": "Book Instant Demo",
+    "placeholder": "Enter your official work email",
+    "success": "Awesome! Your spot is secured, we will contact you within 2 hours to deploy."
+  },
+  "footer": {
+    "product": "Product",
+    "company": "Company",
+    "legal": "Legal",
+    "about": "About",
+    "contact": "Contact",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "rights": "All rights reserved."
+    },
+  "chat": {
+    "welcome": "Hello! I'm the Smart Real Estate Assistant. How can I help you find your property today?",
+    "error": "An error occurred, please try again later.",
+    "loading": "AI is thinking...",
+    "placeholder": "Ask your real estate question..."
+  },
+  
+  "seo": {
+    "title": "PropAI – AI‑Powered Real Estate Platform",
+    "description": "Modular AI SaaS for real‑estate agencies – qualify leads, automate omnichannel communication, and answer property questions with zero hallucinations.",
+    "ogImage": "/og-image.jpg"
+  },
+  "dashboard": {
+    "title": "Agency Dashboard",
+    "welcome": "Welcome back",
+    "overview": "Overview",
+    "leads": "Leads",
+    "channels": "Channels",
+    "catalog": "Catalog Bot",
+    "documents": "Documents",
+    "settings": "Settings",
+    "stats": {
+      "totalLeads": "Total Leads",
+      "qualifiedLeads": "Qualified",
+      "pendingLeads": "Pending Review",
+      "conversionRate": "Conversion Rate"
+    },
+    "channelsStatus": {
+      "title": "Channel Status",
+      "whatsapp": "WhatsApp",
+      "email": "Email",
+      "sms": "SMS",
+      "connected": "Connected",
+      "disconnected": "Not Connected",
+      "configure": "Configure"
+    },
+    "recentLeads": {
+      "title": "Recent Leads",
+      "name": "Name",
+      "source": "Source",
+      "score": "Score",
+      "status": "Status"
+    }
+  }
+}
