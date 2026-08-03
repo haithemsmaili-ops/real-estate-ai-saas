@@ -57,8 +57,8 @@
     "plans": {
       "starter": {
         "name": "Starter Accéléré",
-        "setupPrice": "80,000 DZD",
-        "monthlyPrice": "30,000 DZD",
+        "setupPrice": "9,000 DZD",
+        "monthlyPrice": "5,000 DZD",
         "period": "mensuel",
         "badge": "Le plus populaire pour les nouveaux bureaux",
         "valueStack": [
@@ -71,8 +71,8 @@
       },
       "growth": {
         "name": "Croissance & Domination",
-        "setupPrice": "12 Millions",
-        "monthlyPrice": "5 Millions",
+        "setupPrice": "12,000 DZD",
+        "monthlyPrice": "6,000 DZD",
         "period": "mensuel",
         "badge": "Valeur & ROI les plus élevés",
         "valueStack": [

@@ -49,7 +49,7 @@ export function Hero({ dict, locale }: HeroProps) {
           </div>
 
           <div className="mt-16 grid grid-cols-3 gap-8 border-t border-surface-200 pt-10">
-            {Object.entries(dict.hero.stats).map(([key, stat]) => (
+            {Object.entries(dict.hero.stats as Record<string, string>).map(([key, stat]) => (
               <div key={key}>
                 <p className="text-2xl font-bold text-brand-600 sm:text-3xl">
                   {stat}

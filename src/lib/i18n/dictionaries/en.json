@@ -57,8 +57,8 @@
     "plans": {
       "starter": {
         "name": "Fast-Track Starter",
-        "setupPrice": "80,000 DZD",
-        "monthlyPrice": "30,000 DZD",
+        "setupPrice": "9,000 DZD",
+        "monthlyPrice": "5,000 DZD",
         "period": "monthly",
         "badge": "Most Popular for New Offices",
         "valueStack": [
@@ -71,8 +71,8 @@
       },
       "growth": {
         "name": "Scale & Dominate",
-        "setupPrice": "120,000 DZD",
-        "monthlyPrice": "50,000 DZD",
+        "setupPrice": "12,000 DZD",
+        "monthlyPrice": "6,000 DZD",
         "period": "monthly",
         "badge": "Highest Value & ROI",
         "valueStack": [
@@ -119,14 +119,13 @@
     "privacy": "Privacy Policy",
     "terms": "Terms of Service",
     "rights": "All rights reserved."
-    },
+  },
   "chat": {
     "welcome": "Hello! I'm the Smart Real Estate Assistant. How can I help you find your property today?",
     "error": "An error occurred, please try again later.",
     "loading": "AI is thinking...",
     "placeholder": "Ask your real estate question..."
   },
-  
   "seo": {
     "title": "PropAI – AI‑Powered Real Estate Platform",
     "description": "Modular AI SaaS for real‑estate agencies – qualify leads, automate omnichannel communication, and answer property questions with zero hallucinations.",

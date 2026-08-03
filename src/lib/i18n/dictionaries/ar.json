@@ -57,8 +57,8 @@
     "plans": {
       "starter": {
         "name": "خطة الانطلاق السريع",
-        "setupPrice": "80,000 د.ج",
-        "monthlyPrice": "30,000 د.ج",
+        "setupPrice": "9,000 DZD",
+        "monthlyPrice": "5,000 DZD",
         "period": "شهرياً",
         "badge": "الأكثر طلباً للمكاتب الناشئة",
         "valueStack": [
@@ -71,8 +71,8 @@
       },
       "growth": {
         "name": "خطة التوسع والهيمنة",
-        "setupPrice": "120,000 د.ج",
-        "monthlyPrice": "50,000 د.ج",
+        "setupPrice": "12,000 DZD",
+        "monthlyPrice": "6,000 DZD",
         "period": "شهرياً",
         "badge": "الأعلى قيمة وعائداً",
         "valueStack": [

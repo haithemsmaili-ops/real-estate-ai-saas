@@ -1,12 +1,12 @@
-import type { Locale } from "./config";
+import type { Locale } from './config';
 
 const dictionaries = {
-  en: () => import("./dictionaries/en.json").then((m) => m.default),
-  ar: () => import("./dictionaries/ar.json").then((m) => m.default),
-  fr: () => import("./dictionaries/fr.json").then((m) => m.default),
+  ar: () => import('./dictionaries/ar.json').then((module) => module.default),
+  en: () => import('./dictionaries/en.json').then((module) => module.default),
+  fr: () => import('./dictionaries/fr.json').then((module) => module.default),
 };
 
-export type Dictionary = Awaited<ReturnType<typeof dictionaries.en>>;
+export type Dictionary = typeof import("./dictionaries/en.json");
 
 export async function getDictionary(locale: Locale): Promise<Dictionary> {
   const loader = dictionaries[locale] ?? dictionaries['en'];
