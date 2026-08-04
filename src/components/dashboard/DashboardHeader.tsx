@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { siteConfig } from "@/config/site";
 import type { Dictionary } from "@/lib/i18n/get-dictionary";
 import type { Locale } from "@/lib/i18n/config";
@@ -11,15 +14,25 @@ interface DashboardHeaderProps {
 }
 
 export function DashboardHeader({ dict, locale }: DashboardHeaderProps) {
+  const pathname = usePathname();
+
+  // تحديد اللغة الحالية بدقة لضمان تحويل صحيح للصفحة الرئيسية
+  const currentLang = locale || pathname.split("/")[1] || "ar";
+  const homePath = `/${currentLang}`;
+
   return (
     <header className="flex h-16 items-center justify-between border-b border-surface-200 bg-white px-6">
       <div className="flex items-center gap-6">
-        {/* رابط اللوجو والاسم للعودة للصفحة الرئيسية */}
-        <Link href={`/${locale}`} className="flex items-center gap-2.5 transition-opacity hover:opacity-80 cursor-pointer">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-600 text-white">
+        {/* رابط اللوجو والاسم للعودة للصفحة الرئيسية - مضمون التوجيه */}
+        <Link
+          href={homePath}
+          className="flex items-center gap-2.5 transition-transform hover:scale-105 active:scale-95 cursor-pointer group"
+          title="العودة للصفحة الرئيسية"
+        >
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-600 text-white shadow-sm transition-colors group-hover:bg-brand-700">
             <Building2 className="h-5 w-5" />
           </div>
-          <span className="text-xl font-bold tracking-tight text-surface-900 hidden sm:inline">
+          <span className="text-xl font-bold tracking-tight text-surface-900 transition-colors group-hover:text-brand-600">
             {siteConfig.name}
           </span>
         </Link>

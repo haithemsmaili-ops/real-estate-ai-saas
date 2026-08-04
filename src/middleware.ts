@@ -26,14 +26,15 @@ export function middleware(request: NextRequest) {
     return response;
   }
 
-  // Redirect to default locale or cookie preference
+  // Redirect root or non-prefixed paths to default locale or cookie preference
   const cookieLocale = request.cookies.get(LOCALE_COOKIE)?.value;
   const locale =
     cookieLocale && isValidLocale(cookieLocale) ? cookieLocale : defaultLocale;
 
-  const url = request.nextUrl.clone();
-  url.pathname = `/${locale}${pathname === "/" ? "" : pathname}`;
-  return NextResponse.redirect(url);
+  const targetPath = pathname === "/" ? "" : pathname;
+  const redirectUrl = new URL(`/${locale}${targetPath}`, request.url);
+
+  return NextResponse.redirect(redirectUrl);
 }
 
 export const config = {
