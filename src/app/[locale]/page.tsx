@@ -27,7 +27,7 @@ export default async function HomePage({ params }: HomePageProps) {
         <PricingSection dict={dict} locale={locale} />
         <RequestDemoCTA dict={dict} />
       </main>
-      <Footer dict={dict} locale={locale} />
+      <Footer dict={dict} />
     </ClientLandingWrapper>
   );
 }
