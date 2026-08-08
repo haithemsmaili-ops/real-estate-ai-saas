@@ -5,7 +5,7 @@ import { Hero } from "@/components/landing/Hero";
 import { FeaturesGrid } from "@/components/landing/FeaturesGrid";
 import { PricingSection } from "@/components/landing/PricingSection";
 import { RequestDemoCTA } from "@/components/landing/RequestDemoCTA";
-import { Footer } from "@/components/landing/Footer";
+import Footer from "@/components/landing/Footer";
 import { ClientLandingWrapper } from "@/components/landing/ClientLandingWrapper";
 
 interface HomePageProps {
