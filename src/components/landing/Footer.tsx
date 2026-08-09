@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+"use client";
+
+import { useState } from 'react';
 import Link from 'next/link';
 
 export default function Footer({ dict }: { dict?: any }) {

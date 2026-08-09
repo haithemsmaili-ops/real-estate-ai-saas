@@ -6,7 +6,7 @@ const dictionaries = {
   fr: () => import('./dictionaries/fr.json').then((module) => module.default),
 };
 
-export type Dictionary = typeof import("./dictionaries/en.json");
+export type Dictionary = Record<string, any>;
 
 export async function getDictionary(locale: Locale): Promise<Dictionary> {
   const loader = dictionaries[locale] ?? dictionaries['en'];
