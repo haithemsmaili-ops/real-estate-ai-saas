@@ -1,18 +1,22 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { getDictionary } from '@/lib/i18n/get-dictionary';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import Link from 'next/link';
+// إذا كنت تستخدم NextAuth تفعل هذا السطر:
+// import { signIn } from 'next-auth/react';
 
 export default function SignInPage() {
   const params = useParams();
+  const router = useRouter();
   const lang = (params?.lang as string) || 'ar';
   const isAr = lang === 'ar';
 
   const [dict, setDict] = useState<any>(null);
   const [isRegister, setIsRegister] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (lang) {
@@ -24,9 +28,47 @@ export default function SignInPage() {
 
   const t = dict?.auth || {};
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // تسجيل الدخول مع جوجل
+  const handleGoogleSignIn = async () => {
+    setLoading(true);
+    try {
+      // 1. إذا كنت تستخدم NextAuth:
+      // await signIn('google', { callbackUrl: `/${lang}/dashboard` });
+
+      // 2. توجيه مؤقت للوحة التحكم للتحقق من عمل الواجهة:
+      router.push(`/${lang}/dashboard`);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // تسجيل الدخول أو إنشاء حساب بالبريد الإلكتروني
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // يمكنك إضافة منطق تسجيل الدخول أو إنشائه هنا لاحقاً
+    setLoading(true);
+
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get('email');
+    const password = formData.get('password');
+
+    try {
+      if (isRegister) {
+        // منطق إنشاء حساب جديد (API Call)
+        console.log('Registering:', email);
+      } else {
+        // منطق تسجيل الدخول
+        console.log('Signing in:', email);
+      }
+
+      // التوجيه فوراً إلى لوحة التحكم بعد نجاح الدخول/الإنشاء
+      router.push(`/${lang}/dashboard`);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -44,7 +86,13 @@ export default function SignInPage() {
         </div>
 
         {/* زر جوجل */}
-        <Button variant="outline" className="w-full mb-4 flex items-center justify-center gap-2" type="button">
+        <Button
+          variant="outline"
+          className="w-full mb-4 flex items-center justify-center gap-2"
+          type="button"
+          onClick={handleGoogleSignIn}
+          disabled={loading}
+        >
           <svg className="h-5 w-5" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
             <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.21l6.87-6.87C36.87 2.94 30.8 0 24 0 14.62 0 6.59 5.39 2.64 13.11l7.86 6.1C12.55 12.72 17.81 9.5 24 9.5z" />
             <path fill="#4285F4" d="M46.1 24.5c0-1.53-.14-3.02-.38-4.46H24v8.44h12.44c-.53 2.84-2.15 5.25-4.58 6.86v5.71h7.39c4.33-4 6.85-9.87 6.85-16.55z" />
@@ -82,10 +130,12 @@ export default function SignInPage() {
             placeholder={t?.passwordPlaceholder || (isAr ? "كلمة المرور" : "Password")}
             required
           />
-          <Button type="submit" className="w-full">
-            {isRegister
-              ? (t?.registerButton || (isAr ? "إنشاء حساب" : "Register"))
-              : (t?.signInButton || (isAr ? "تسجيل الدخول" : "Sign In"))}
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? (isAr ? "جاري المعالجة..." : "Processing...") : (
+              isRegister
+                ? (t?.registerButton || (isAr ? "إنشاء حساب" : "Register"))
+                : (t?.signInButton || (isAr ? "تسجيل الدخول" : "Sign In"))
+            )}
           </Button>
         </form>
 
