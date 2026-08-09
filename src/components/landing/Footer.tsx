@@ -1,13 +1,12 @@
-'use client';
-
 import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
 
-export default function Footer() {
-  const { t } = useTranslation();
+export default function Footer({ dict }: { dict?: any }) {
   const [isAboutOpen, setIsAboutOpen] = useState(false);
-const [isContactOpen, setIsContactOpen] = useState(false);
+  const [isContactOpen, setIsContactOpen] = useState(false);
+
+  const f = dict?.footer || {};
+
   return (
     <footer className="border-t border-surface-200 bg-surface-50 py-12 dark:border-surface-800 dark:bg-surface-900">
       <div className="container mx-auto px-4 max-w-7xl">
@@ -17,55 +16,61 @@ const [isContactOpen, setIsContactOpen] = useState(false);
           <div className="space-y-4">
             <h3 className="text-xl font-bold text-surface-900 dark:text-white">PropAI</h3>
             <p className="text-sm text-surface-600 dark:text-surface-400">
-                              {t('footer.brandDescription')}
+              {f.brandDescription || "The first AI platform for real estate agencies in Algeria."}
             </p>
           </div>
 
           {/* Links Column 1: Products */}
           <div>
-            <h4 className="font-semibold text-surface-900 dark:text-white mb-3">{t('footer.productHeading')}</h4>
+            <h4 className="font-semibold text-surface-900 dark:text-white mb-3">
+              {f.productHeading || f.product || "Product"}
+            </h4>
             <ul className="space-y-2 text-sm text-surface-600 dark:text-surface-400">
-              <li><Link href="#features" className="hover:text-brand-600">{t('footer.features')}</Link></li>
-              <li><Link href="#dashboard" className="hover:text-brand-600">{t('footer.dashboard')}</Link></li>
+              <li><Link href="#features" className="hover:text-brand-600">{f.features || "Features"}</Link></li>
+              <li><Link href="#dashboard" className="hover:text-brand-600">{f.dashboard || "Dashboard"}</Link></li>
             </ul>
           </div>
 
           {/* Links Column 2: Company */}
           <div>
-            <h4 className="font-semibold text-surface-900 dark:text-white mb-3">{t('footer.companyHeading')}</h4>
+            <h4 className="font-semibold text-surface-900 dark:text-white mb-3">
+              {f.companyHeading || f.company || "Company"}
+            </h4>
             <ul className="space-y-2 text-sm text-surface-600 dark:text-surface-400">
               <li>
-                  <button
-                    onClick={() => setIsAboutOpen(true)}
-                    className="hover:text-brand-600 w-full transition-colors cursor-pointer"
-                  >
-                                        {t('footer.aboutUs')}
-                  </button>
+                <button
+                  onClick={() => setIsAboutOpen(true)}
+                  className="hover:text-brand-600 transition-colors cursor-pointer text-left"
+                >
+                  {f.aboutUs || f.about || "About Us"}
+                </button>
               </li>
               <li>
-                  <button
-                    onClick={() => setIsContactOpen(true)}
-                    className="hover:text-brand-600 w-full transition-colors cursor-pointer"
-                  >
-                                        {t('footer.contactUs')}
-                  </button>
+                <button
+                  onClick={() => setIsContactOpen(true)}
+                  className="hover:text-brand-600 transition-colors cursor-pointer text-left"
+                >
+                  {f.contactUs || f.contact || "Contact Us"}
+                </button>
               </li>
             </ul>
           </div>
 
           {/* Links Column 3: Legal */}
           <div>
-            <h4 className="font-semibold text-surface-900 dark:text-white mb-3">{t('footer.legalHeading')}</h4>
+            <h4 className="font-semibold text-surface-900 dark:text-white mb-3">
+              {f.legalHeading || f.legal || "Legal"}
+            </h4>
             <ul className="space-y-2 text-sm text-surface-600 dark:text-surface-400">
-                <li><Link href="#" className="hover:text-brand-600">{t('footer.privacy')}</Link></li>
-                <li><Link href="#" className="hover:text-brand-600">{t('footer.terms')}</Link></li>
+              <li><Link href="#" className="hover:text-brand-600">{f.privacy || "Privacy Policy"}</Link></li>
+              <li><Link href="#" className="hover:text-brand-600">{f.terms || "Terms of Service"}</Link></li>
             </ul>
           </div>
 
         </div>
 
         <div className="mt-8 pt-8 border-t border-surface-200 dark:border-surface-800 text-center text-sm text-surface-500">
-          © {new Date().getFullYear()} PropAI. {t('footer.copyright')}
+          © {new Date().getFullYear()} PropAI. {f.copyright || f.rights || "All rights reserved."}
         </div>
       </div>
 
@@ -79,9 +84,11 @@ const [isContactOpen, setIsContactOpen] = useState(false);
             >
               ✕
             </button>
-            <h3 className="text-xl font-bold text-surface-900 dark:text-white mb-4">{t('footer.aboutModalTitle')}</h3>
+            <h3 className="text-xl font-bold text-surface-900 dark:text-white mb-4">
+              {f.aboutModalTitle || "About PropAI"}
+            </h3>
             <p className="text-surface-600 dark:text-surface-300 leading-relaxed text-sm">
-              {t('footer.aboutModalText')}
+              {f.aboutModalText || "PropAI is an advanced AI platform for real estate agencies in Algeria."}
             </p>
           </div>
         </div>
@@ -97,11 +104,13 @@ const [isContactOpen, setIsContactOpen] = useState(false);
             >
               ✕
             </button>
-            <h3 className="text-xl font-bold text-surface-900 dark:text-white mb-4">{t('footer.contactModalTitle')}</h3>
+            <h3 className="text-xl font-bold text-surface-900 dark:text-white mb-4">
+              {f.contactModalTitle || "Contact Us"}
+            </h3>
             <div className="space-y-3 text-sm text-surface-600 dark:text-surface-300">
-              <p>📧 <strong>{t('footer.emailLabel')}:</strong> contact@propai.com</p>
-              <p>📸 <strong>{t('footer.instagramLabel')}:</strong> @propai.dz</p>
-              <p>💼 <strong>{t('footer.linkedinLabel')}:</strong> PropAI Algeria</p>
+              <p>📧 <strong>Email:</strong> contact@propai.com</p>
+              <p>📸 <strong>Instagram:</strong> @propai.dz</p>
+              <p>💼 <strong>LinkedIn:</strong> PropAI Algeria</p>
             </div>
           </div>
         </div>
