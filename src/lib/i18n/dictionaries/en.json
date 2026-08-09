@@ -110,37 +110,7 @@
     "placeholder": "Enter your official work email",
     "success": "Awesome! Your spot is secured, we will contact you within 2 hours to deploy."
   },
-    "footer": {
-    "brandDescription": "The first AI platform for real estate agencies in Algeria enabling instant response and client qualification.",
-    "productHeading": "Product",
-    "features": "Features",
-    "dashboard": "Dashboard",
-    "companyHeading": "Company",
-    "aboutUs": "About Us",
-    "contactUs": "Contact Us",
-    "legalHeading": "Legal",
-    "privacy": "Privacy Policy",
-    "terms": "Terms of Service",
-    "copyright": "All rights reserved.",
-    "aboutModalTitle": "About PropAI",
-    "aboutModalText": "PropAI is an advanced AI platform for real estate agencies in Algeria. It enables automated instant responses on WhatsApp, 24/7 lead qualification, and appointment booking without errors.",
-    "contactModalTitle": "Contact Us"
-  }
-    "brandDescription": "The first AI platform for real estate agencies in Algeria enabling instant response and client qualification.",
-    "productHeading": "Product",
-    "features": "Features",
-    "dashboard": "Dashboard",
-    "companyHeading": "Company",
-    "aboutUs": "About Us",
-    "contactUs": "Contact Us",
-    "legalHeading": "Legal",
-    "privacy": "Privacy Policy",
-    "terms": "Terms of Service",
-    "copyright": "All rights reserved.",
-    "aboutModalTitle": "About PropAI",
-    "aboutModalText": "PropAI is an advanced AI platform for real estate agencies in Algeria. It enables automated instant responses on WhatsApp, 24/7 lead qualification, and appointment booking without errors.",
-    "contactModalTitle": "Contact Us"
-  }
+  "footer": {
     "brandDescription": "The first AI platform for real estate agencies in Algeria enabling instant response and client qualification.",
     "productHeading": "Product",
     "features": "Features",
@@ -155,56 +125,86 @@
     "aboutModalTitle": "About PropAI",
     "aboutModalText": "PropAI is an advanced AI platform for real estate agencies in Algeria. It enables automated instant responses on WhatsApp, 24/7 lead qualification, and appointment booking without errors.",
     "contactModalTitle": "Contact Us",
-    "product": "Product",
-    "company": "Company",
-    "legal": "Legal",
-    "about": "About",
-    "contact": "Contact",
-    "privacy": "Privacy Policy",
-    "terms": "Terms of Service",
-    "rights": "All rights reserved."
-  },
-  "chat": {
-    "welcome": "Hello! I'm the Smart Real Estate Assistant. How can I help you find your property today?",
-    "error": "An error occurred, please try again later.",
-    "loading": "AI is thinking...",
-    "placeholder": "Ask your real estate question..."
-  },
-  "seo": {
-    "title": "PropAI – AI‑Powered Real Estate Platform",
-    "description": "Modular AI SaaS for real‑estate agencies – qualify leads, automate omnichannel communication, and answer property questions with zero hallucinations.",
-    "ogImage": "/og-image.jpg"
-  },
-  "dashboard": {
-    "title": "Agency Dashboard",
-    "welcome": "Welcome back",
-    "overview": "Overview",
-    "leads": "Leads",
-    "channels": "Channels",
-    "catalog": "Catalog Bot",
-    "documents": "Documents",
-    "settings": "Settings",
-    "stats": {
-      "totalLeads": "Total Leads",
-      "qualifiedLeads": "Qualified",
-      "pendingLeads": "Pending Review",
-      "conversionRate": "Conversion Rate"
-    },
-    "channelsStatus": {
-      "title": "Channel Status",
-      "whatsapp": "WhatsApp",
-      "email": "Email",
-      "sms": "SMS",
-      "connected": "Connected",
-      "disconnected": "Not Connected",
-      "configure": "Configure"
-    },
-    "recentLeads": {
-      "title": "Recent Leads",
-      "name": "Name",
-      "source": "Source",
-      "score": "Score",
-      "status": "Status"
-    }
   }
+    "brandDescription": "The first AI platform for real estate agencies in Algeria enabling instant response and client qualification.",
+  "productHeading": "Product",
+  "features": "Features",
+  "dashboard": "Dashboard",
+  "companyHeading": "Company",
+  "aboutUs": "About Us",
+  "contactUs": "Contact Us",
+  "legalHeading": "Legal",
+  "privacy": "Privacy Policy",
+  "terms": "Terms of Service",
+  "copyright": "All rights reserved.",
+  "aboutModalTitle": "About PropAI",
+  "aboutModalText": "PropAI is an advanced AI platform for real estate agencies in Algeria. It enables automated instant responses on WhatsApp, 24/7 lead qualification, and appointment booking without errors.",
+  "contactModalTitle": "Contact Us"
+}
+    "brandDescription": "The first AI platform for real estate agencies in Algeria enabling instant response and client qualification.",
+"productHeading": "Product",
+"features": "Features",
+"dashboard": "Dashboard",
+"companyHeading": "Company",
+"aboutUs": "About Us",
+"contactUs": "Contact Us",
+"legalHeading": "Legal",
+"privacy": "Privacy Policy",
+"terms": "Terms of Service",
+"copyright": "All rights reserved.",
+"aboutModalTitle": "About PropAI",
+"aboutModalText": "PropAI is an advanced AI platform for real estate agencies in Algeria. It enables automated instant responses on WhatsApp, 24/7 lead qualification, and appointment booking without errors.",
+"contactModalTitle": "Contact Us",
+"product": "Product",
+"company": "Company",
+"legal": "Legal",
+"about": "About",
+"contact": "Contact",
+"privacy": "Privacy Policy",
+"terms": "Terms of Service",
+"rights": "All rights reserved."
+},
+"chat": {
+"welcome": "Hello! I'm the Smart Real Estate Assistant. How can I help you find your property today?",
+"error": "An error occurred, please try again later.",
+"loading": "AI is thinking...",
+"placeholder": "Ask your real estate question..."
+},
+"seo": {
+"title": "PropAI – AI‑Powered Real Estate Platform",
+"description": "Modular AI SaaS for real‑estate agencies – qualify leads, automate omnichannel communication, and answer property questions with zero hallucinations.",
+"ogImage": "/og-image.jpg"
+},
+"dashboard": {
+"title": "Agency Dashboard",
+"welcome": "Welcome back",
+"overview": "Overview",
+"leads": "Leads",
+"channels": "Channels",
+"catalog": "Catalog Bot",
+"documents": "Documents",
+"settings": "Settings",
+"stats": {
+  "totalLeads": "Total Leads",
+  "qualifiedLeads": "Qualified",
+  "pendingLeads": "Pending Review",
+  "conversionRate": "Conversion Rate"
+},
+"channelsStatus": {
+  "title": "Channel Status",
+  "whatsapp": "WhatsApp",
+  "email": "Email",
+  "sms": "SMS",
+  "connected": "Connected",
+  "disconnected": "Not Connected",
+  "configure": "Configure"
+},
+"recentLeads": {
+  "title": "Recent Leads",
+  "name": "Name",
+  "source": "Source",
+  "score": "Score",
+  "status": "Status"
+}
+}
 }
