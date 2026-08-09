@@ -16,13 +16,13 @@ export default function Footer({ dict }: { dict?: any }) {
           <div className="space-y-4">
             <h3 className="text-xl font-bold text-surface-900 dark:text-white">PropAI</h3>
             <p className="text-sm text-surface-600 dark:text-surface-400">
-              {dict?.footer?.description || "منصة الذكاء الاصطناعي الأولى للوكالات العقارية في الجزائر لتمكين الاستجابة الفورية وتأهيل العملاء."}
+              {dict?.footer?.brandDescription || "منصة الذكاء الاصطناعي الأولى للوكالات العقارية في الجزائر لتمكين الاستجابة الفورية وتأهيل العملاء."}
             </p>
           </div>
 
           {/* Links Column 1: Products */}
           <div>
-            <h4 className="font-semibold text-surface-900 dark:text-white mb-3">المنتج</h4>
+            <h4 className="font-semibold text-surface-900 dark:text-white mb-3">{dict?.footer?.productHeading || "Product"}</h4>
             <ul className="space-y-2 text-sm text-surface-600 dark:text-surface-400">
               <li><Link href="#features" className="hover:text-brand-600">الميزات الاستثنائية</Link></li>
               <li><Link href="#dashboard" className="hover:text-brand-600">لوحة التحكم الذكية</Link></li>
@@ -31,40 +31,40 @@ export default function Footer({ dict }: { dict?: any }) {
 
           {/* Links Column 2: Company */}
           <div>
-            <h4 className="font-semibold text-surface-900 dark:text-white mb-3">الشركة</h4>
+            <h4 className="font-semibold text-surface-900 dark:text-white mb-3">{dict?.footer?.companyHeading || "Company"}</h4>
             <ul className="space-y-2 text-sm text-surface-600 dark:text-surface-400">
               <li>
-                <button
-                  onClick={() => setIsAboutOpen(true)}
-                  className="hover:text-brand-600 text-right w-full transition-colors cursor-pointer"
-                >
-                  من نحن
-                </button>
+                  <button
+                    onClick={() => setIsAboutOpen(true)}
+                    className="hover:text-brand-600 w-full transition-colors cursor-pointer"
+                  >
+                    {dict?.footer?.aboutUs || "About Us"}
+                  </button>
               </li>
               <li>
-                <button
-                  onClick={() => setIsContactOpen(true)}
-                  className="hover:text-brand-600 text-right w-full transition-colors cursor-pointer"
-                >
-                  اتصل بنا
-                </button>
+                  <button
+                    onClick={() => setIsContactOpen(true)}
+                    className="hover:text-brand-600 w-full transition-colors cursor-pointer"
+                  >
+                    {dict?.footer?.contactUs || "Contact Us"}
+                  </button>
               </li>
             </ul>
           </div>
 
           {/* Links Column 3: Legal */}
           <div>
-            <h4 className="font-semibold text-surface-900 dark:text-white mb-3">قانوني</h4>
+            <h4 className="font-semibold text-surface-900 dark:text-white mb-3">{dict?.footer?.legalHeading || "Legal"}</h4>
             <ul className="space-y-2 text-sm text-surface-600 dark:text-surface-400">
-              <li><Link href="#" className="hover:text-brand-600">سياسة الخصوصية</Link></li>
-              <li><Link href="#" className="hover:text-brand-600">شروط الخدمة</Link></li>
+                <li><Link href="#" className="hover:text-brand-600">{dict?.footer?.privacy || "Privacy Policy"}</Link></li>
+                <li><Link href="#" className="hover:text-brand-600">{dict?.footer?.terms || "Terms of Service"}</Link></li>
             </ul>
           </div>
 
         </div>
 
         <div className="mt-8 pt-8 border-t border-surface-200 dark:border-surface-800 text-center text-sm text-surface-500">
-          © {new Date().getFullYear()} PropAI. جميع الحقوق محفوظة.
+          © {new Date().getFullYear()} PropAI. {dict?.footer?.copyright || "All rights reserved."}
         </div>
       </div>
 
@@ -78,9 +78,9 @@ export default function Footer({ dict }: { dict?: any }) {
             >
               ✕
             </button>
-            <h3 className="text-xl font-bold text-surface-900 dark:text-white mb-4">عن PropAI</h3>
+            <h3 className="text-xl font-bold text-surface-900 dark:text-white mb-4">{dict?.footer?.aboutModalTitle || "About PropAI"}</h3>
             <p className="text-surface-600 dark:text-surface-300 leading-relaxed text-sm">
-              PropAI هي منصة ذكاء اصطناعي متقدمة مخصصة للوكالات العقارية في الجزائر. تتيح لك المنصة الرد الآلي والفوري على استفسارات العملاء عبر الواتساب، وتأهيل المشتريين المحتملين على مدار 24/7 دون أي أخطاء.
+              {dict?.footer?.aboutModalText || "PropAI هي منصة ذكاء اصطناعي متقدمة مخصصة للوكالات العقارية في الجزائر. تتيح لك المنصة الرد الآلي والفوري على استفسارات العملاء عبر الواتساب، وتأهيل المشتريين المحتملين على مدار 24/7 دون أي أخطاء."}
             </p>
           </div>
         </div>
@@ -96,7 +96,7 @@ export default function Footer({ dict }: { dict?: any }) {
             >
               ✕
             </button>
-            <h3 className="text-xl font-bold text-surface-900 dark:text-white mb-4">تواصل معنا</h3>
+            <h3 className="text-xl font-bold text-surface-900 dark:text-white mb-4">{dict?.footer?.contactModalTitle || "Contact Us"}</h3>
             <div className="space-y-3 text-sm text-surface-600 dark:text-surface-300">
               <p>📧 <strong>البريد الإلكتروني:</strong> contact@propai.com</p>
               <p>📸 <strong>انستغرام:</strong> @propai.dz</p>
