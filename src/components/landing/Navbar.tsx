@@ -13,12 +13,12 @@ interface NavbarProps {
 
 export function Navbar({ dict, locale }: NavbarProps) {
   return (
-    <header className="sticky top-0 z-50 border-b border-surface-200/80 bg-white/80 backdrop-blur-xl shadow-md glass-bg">
+    <header className="sticky top-0 z-50 border-b border-surface-200/80 bg-white/85 backdrop-blur-xl shadow-md glass-bg">
       <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        
-        {/* رابط الشعار واسم الموقع الذي يعيدك للصفحة الرئيسية */}
+
+        {/* رابط الشعار واسم الموقع الذي يعيدك للصفحة الرئيسية حسب اللغة */}
         <Link href={`/${locale}`} className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-600 text-white">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-600 text-white shadow-sm">
             <Building2 className="h-5 w-5" />
           </div>
           <span className="text-xl font-bold tracking-tight text-surface-900">
@@ -34,8 +34,7 @@ export function Navbar({ dict, locale }: NavbarProps) {
           >
             {dict.nav.features}
           </Link>
-          
-          {/* الإضافة الجديدة: رابط الخطط والأسعار */}
+
           <Link
             href={`/${locale}#pricing`}
             className="text-sm font-medium text-surface-600 transition-colors hover:text-brand-600"
@@ -51,12 +50,15 @@ export function Navbar({ dict, locale }: NavbarProps) {
           </Link>
         </div>
 
-        {/* أزرار اللغة والطلب */}
+        {/* أزرار اللغة والطلب والمصادقة */}
         <div className="flex items-center gap-3">
           <LanguageToggle locale={locale} />
+
+          {/* تم تعديل الرابط هنا ليدعم اللغة الحالية ديناميكياً */}
           <Link href={`/${locale}/auth/signin`} className="hidden sm:block">
-            <Button size="sm">Sign In</Button>
+            <Button size="sm" variant="outline">Sign In</Button>
           </Link>
+
           <Link href={`/${locale}#demo`} className="hidden sm:block">
             <Button size="sm">{dict.nav.requestDemo}</Button>
           </Link>
