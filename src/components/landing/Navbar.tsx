@@ -54,7 +54,7 @@ export function Navbar({ dict, locale }: NavbarProps) {
         {/* أزرار اللغة والطلب */}
         <div className="flex items-center gap-3">
           <LanguageToggle locale={locale} />
-          <Link href="/auth/signin" className="hidden sm:block">
+          <Link href={`/${locale}/auth/signin`} className="hidden sm:block">
             <Button size="sm">Sign In</Button>
           </Link>
           <Link href={`/${locale}#demo`} className="hidden sm:block">
