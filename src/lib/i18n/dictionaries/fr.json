@@ -111,14 +111,20 @@
     "success": "Super ! Votre place est réservée, nous vous contacterons sous 2 heures pour le déploiement."
   },
   "footer": {
+    "brandDescription": "La première plateforme IA pour les agences immobilières en Algérie.",
     "product": "Produit",
+    "features": "Fonctionnalités",
+    "dashboard": "Tableau de Bord",
     "company": "Entreprise",
-    "legal": "Légal",
     "about": "À propos",
     "contact": "Contact",
+    "legal": "Légal",
     "privacy": "Politique de confidentialité",
     "terms": "Conditions d'utilisation",
-    "rights": "Tous droits réservés."
+    "rights": "Tous droits réservés.",
+    "aboutModalTitle": "À propos de PropAI",
+    "aboutModalText": "PropAI est une plateforme IA avancée pour les agences immobilières en Algérie, permettant des réponses instantanées automatisées sur WhatsApp, une qualification 24/7 et la prise de rendez-vous sans erreurs.",
+    "contactModalTitle": "Contactez-nous"
   },
   "dashboard": {
     "title": "Tableau de bord agence",
