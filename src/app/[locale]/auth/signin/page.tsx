@@ -16,7 +16,7 @@ export default function SignInPage() {
   }, [lang]);
 
   if (!dict) return null;
-  const t = dict.auth;
+  const t = dict?.auth || {};
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-surface-100 to-surface-200 p-4">
@@ -26,7 +26,7 @@ export default function SignInPage() {
             <h1 className="text-2xl font-bold text-brand-600">PropAI</h1>
           </Link>
           <h2 className="text-xl font-semibold text-surface-900">
-            {isRegister ? t.registerTitle : t.signInTitle}
+            {isRegister ? (t?.registerTitle || "إنشاء حساب") : (t?.signInTitle || "تسجيل الدخول")}
           </h2>
         </div>
 
