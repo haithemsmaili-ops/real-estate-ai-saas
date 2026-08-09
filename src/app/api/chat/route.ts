@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import OpenAI from "openai";
 
 const SYSTEM_PROMPT = `
@@ -13,9 +14,10 @@ Rules:
 - If the client's budget or interest is strong, tag them as a "HOT_LEAD".
 `;
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
-    const { message } = await req.json();
+    const body = await req.json();
+    const message = body?.message;
 
     if (!message) {
       return NextResponse.json(
@@ -26,7 +28,6 @@ export async function POST(req: Request) {
 
     const apiKey = process.env.OPENAI_API_KEY;
 
-    // إذا لم يكن المفتاح موجوداً، نعيد رداً تجريبياً فوراً دون انهيار السيرفر
     if (!apiKey || apiKey === "YOUR_OPENAI_API_KEY") {
       return NextResponse.json({
         success: true,
@@ -56,7 +57,7 @@ export async function POST(req: Request) {
   } catch (error: any) {
     console.error("[API] Chat error:", error);
     return NextResponse.json(
-      { error: "Failed to process chat message", details: error.message },
+      { error: "Failed to process chat message", details: error?.message || "Unknown error" },
       { status: 500 }
     );
   }
