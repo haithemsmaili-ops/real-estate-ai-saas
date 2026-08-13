@@ -1,8 +1,19 @@
 import fs from 'fs';
 import path from 'path';
+import os from 'os';
 
-// Define the absolute path to the db files
-const DB_DIR = path.join(process.cwd(), 'src', 'lib', 'db', 'data');
+// Determine if we are running in a serverless environment (Vercel)
+const isServerless = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production';
+
+// Helper to determine active database directory (using temp folder on Vercel)
+const getDbDir = () => {
+  if (isServerless) {
+    return path.join(os.tmpdir(), 'propai-db');
+  }
+  return path.join(process.cwd(), 'src', 'lib', 'db', 'data');
+};
+
+const SOURCE_DIR = path.join(process.cwd(), 'src', 'lib', 'db', 'data');
 
 export interface UserRecord {
   id: string;
@@ -40,7 +51,7 @@ export interface LeadRecord {
   createdAt: string;
 }
 
-const seedLeads = [
+const seedLeads: LeadRecord[] = [
   {
     id: "lead_1",
     tenantId: "demo",
@@ -87,86 +98,105 @@ const seedLeads = [
   }
 ];
 
-const seedProperties = [
+const seedProperties: PropertyRecord[] = [
   {
     id: "prop_1",
     title: "فيلا فاخرة مع مسبح في المرادية",
-    type: "sale" as const,
+    type: "sale",
     price: "45,000,000 دج",
     location: "المرادية، الجزائر",
-    status: "available" as const,
+    status: "available",
     createdAt: new Date("2026-08-01").toISOString()
   },
   {
     id: "prop_2",
     title: "شقة حديثة F3 مطلة على البحر",
-    type: "rent" as const,
+    type: "rent",
     price: "85,000 دج / شهرياً",
     location: "عين بنيان، الجزائر",
-    status: "available" as const,
+    status: "available",
     createdAt: new Date("2026-08-05").toISOString()
   },
   {
     id: "prop_3",
     title: "مكتب تجاري مجهز بالكامل",
-    type: "rent" as const,
+    type: "rent",
     price: "150,000 دج / شهرياً",
     location: "باب الزوار، الجزائر",
-    status: "rented" as const,
+    status: "rented",
     createdAt: new Date("2026-08-10").toISOString()
   }
 ];
 
-// Ensure the database directory and files exist
-function ensureDbInitialized() {
-  if (!fs.existsSync(DB_DIR)) {
-    fs.mkdirSync(DB_DIR, { recursive: true });
+// In-memory state cache as a fallback if file operations fail completely
+const inMemoryCache: Record<string, any[]> = {
+  'users.json': [],
+  'properties.json': seedProperties,
+  'leads.json': seedLeads
+};
+
+// Safe DB reader
+function readDbFile<T>(filename: string, defaultSeed: T[]): T[] {
+  const dbDir = getDbDir();
+  const filePath = path.join(dbDir, filename);
+
+  try {
+    if (fs.existsSync(filePath)) {
+      const content = fs.readFileSync(filePath, 'utf-8');
+      const data = JSON.parse(content);
+      // Sync cache
+      inMemoryCache[filename] = data;
+      return data;
+    }
+  } catch (e) {
+    console.warn(`[DB] Failed to read from active file ${filePath}:`, e);
   }
 
-  const files = [
-    { name: 'users.json', seed: [] },
-    { name: 'properties.json', seed: seedProperties },
-    { name: 'leads.json', seed: seedLeads }
-  ];
-
-  files.forEach((file) => {
-    const filePath = path.join(DB_DIR, file.name);
-    let shouldWriteSeed = false;
-
-    if (!fs.existsSync(filePath)) {
-      shouldWriteSeed = true;
-    } else {
-      try {
-        const content = fs.readFileSync(filePath, 'utf-8');
-        const parsed = JSON.parse(content);
-        if (!Array.isArray(parsed) || parsed.length === 0) {
-          shouldWriteSeed = true;
-        }
-      } catch (e) {
-        shouldWriteSeed = true;
+  // Fallback to original source location if serverless
+  if (isServerless) {
+    const sourcePath = path.join(SOURCE_DIR, filename);
+    try {
+      if (fs.existsSync(sourcePath)) {
+        const content = fs.readFileSync(sourcePath, 'utf-8');
+        const data = JSON.parse(content);
+        // Cache it & attempt writing to /tmp
+        inMemoryCache[filename] = data;
+        writeDbFile(filename, data);
+        return data;
       }
+    } catch (e) {
+      console.warn(`[DB] Failed to read source template ${sourcePath}:`, e);
     }
+  }
 
-    if (shouldWriteSeed) {
-      fs.writeFileSync(filePath, JSON.stringify(file.seed, null, 2), 'utf-8');
-    }
-  });
+  return (inMemoryCache[filename] as T[]) || defaultSeed;
 }
 
-// Initialize database
-ensureDbInitialized();
+// Safe DB writer
+function writeDbFile<T>(filename: string, data: T[]) {
+  // Update memory cache
+  inMemoryCache[filename] = data;
+
+  const dbDir = getDbDir();
+  try {
+    if (!fs.existsSync(dbDir)) {
+      fs.mkdirSync(dbDir, { recursive: true });
+    }
+    const filePath = path.join(dbDir, filename);
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
+  } catch (e) {
+    console.error(`[DB] EROFS / Write error on ${filename}. Defaulting to in-memory storage:`, e);
+  }
+}
 
 export const jsonDb = {
   // --- USERS ---
   getUsers(): UserRecord[] {
-    ensureDbInitialized();
-    const content = fs.readFileSync(path.join(DB_DIR, 'users.json'), 'utf-8');
-    return JSON.parse(content);
+    return readDbFile<UserRecord>('users.json', []);
   },
 
   saveUsers(users: UserRecord[]) {
-    ensureDbInitialized();
-    fs.writeFileSync(path.join(DB_DIR, 'users.json'), JSON.stringify(users, null, 2), 'utf-8');
+    writeDbFile('users.json', users);
   },
 
   getUserByEmail(email: string): UserRecord | undefined {
@@ -191,14 +221,11 @@ export const jsonDb = {
 
   // --- PROPERTIES ---
   getProperties(): PropertyRecord[] {
-    ensureDbInitialized();
-    const content = fs.readFileSync(path.join(DB_DIR, 'properties.json'), 'utf-8');
-    return JSON.parse(content);
+    return readDbFile<PropertyRecord>('properties.json', seedProperties);
   },
 
   saveProperties(properties: PropertyRecord[]) {
-    ensureDbInitialized();
-    fs.writeFileSync(path.join(DB_DIR, 'properties.json'), JSON.stringify(properties, null, 2), 'utf-8');
+    writeDbFile('properties.json', properties);
   },
 
   addProperty(property: PropertyRecord) {
@@ -219,14 +246,11 @@ export const jsonDb = {
 
   // --- LEADS ---
   getLeads(): LeadRecord[] {
-    ensureDbInitialized();
-    const content = fs.readFileSync(path.join(DB_DIR, 'leads.json'), 'utf-8');
-    return JSON.parse(content);
+    return readDbFile<LeadRecord>('leads.json', seedLeads);
   },
 
   saveLeads(leads: LeadRecord[]) {
-    ensureDbInitialized();
-    fs.writeFileSync(path.join(DB_DIR, 'leads.json'), JSON.stringify(leads, null, 2), 'utf-8');
+    writeDbFile('leads.json', leads);
   },
 
   addLead(lead: LeadRecord) {
