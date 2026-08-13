@@ -21,7 +21,7 @@ export function PricingSection({ dict, locale }: PricingProps) {
       key: "starter",
       icon: <Zap className="w-6 h-6 text-blue-600" />,
       popular: false,
-      
+
     },
     {
       key: "growth",
@@ -43,7 +43,7 @@ export function PricingSection({ dict, locale }: PricingProps) {
   return (
     <section id="pricing" className="py-24 bg-gray-50/50 dir-rtl relative">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        
+
         {/* الترويسة */}
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
@@ -61,11 +61,10 @@ export function PricingSection({ dict, locale }: PricingProps) {
             return (
               <div
                 key={key}
-                className={`relative bg-white glass-bg animate-fade-in-up rounded-3xl p-8 shadow-sm border flex flex-col justify-between transition-all hover:shadow-xl hover:scale-105 transition-transform cursor-pointer ${
-                  popular
+                className={`relative bg-white glass-bg animate-fade-in-up rounded-3xl p-8 shadow-sm border flex flex-col justify-between transition-all hover:shadow-xl hover:scale-105 transition-transform cursor-pointer ${popular
                     ? "border-blue-600 ring-2 ring-blue-600/20 lg:-translate-y-2"
                     : "border-gray-200"
-                }`}
+                  }`}
                 onClick={() => setSelectedPlan(key)} // عند الضغط يتم تفعيل النافذة المنبثقة
               >
                 {popular && (
@@ -102,11 +101,10 @@ export function PricingSection({ dict, locale }: PricingProps) {
                 </div>
 
                 <button
-                  className={`w-full py-3.5 px-6 rounded-xl font-semibold text-center transition-all ${
-                    popular
+                  className={`w-full py-3.5 px-6 rounded-xl font-semibold text-center transition-all ${popular
                       ? "bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/20"
                       : "bg-gray-100 hover:bg-gray-200 text-gray-900"
-                  }`}
+                    }`}
                 >
                   {planData.cta}
                 </button>
@@ -120,7 +118,7 @@ export function PricingSection({ dict, locale }: PricingProps) {
       {selectedPlan && activePlan && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
           {/* خلفية ضبابية تغطي الشاشة بالكامل */}
-          <div 
+          <div
             className="absolute inset-0 bg-gray-900/40 backdrop-blur-md transition-opacity"
             onClick={() => setSelectedPlan(null)} // إغلاق عند الضغط على الخلفية
           ></div>
@@ -128,7 +126,7 @@ export function PricingSection({ dict, locale }: PricingProps) {
           {/* محتوى النافذة المنبثقة */}
           <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
             {/* زر الإغلاق */}
-            <button 
+            <button
               onClick={() => setSelectedPlan(null)}
               className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
             >
@@ -185,7 +183,7 @@ export function PricingSection({ dict, locale }: PricingProps) {
                     router.push(`/${locale}/auth/signin?plan=${selectedPlan}`);
                     return;
                   }
-                  
+
                   setPayLoading(true);
                   try {
                     const res = await fetch("/api/payment/success", {
@@ -197,7 +195,7 @@ export function PricingSection({ dict, locale }: PricingProps) {
                     if (!res.ok) {
                       throw new Error(data.error || "خطأ أثناء إرسال الدفع");
                     }
-                    
+
                     alert(locale === "ar" ? "تم الدفع بنجاح! جاري توجيهك إلى لوحة التحكم." : "Payment successful! Redirecting to dashboard.");
                     setSelectedPlan(null);
                     router.push(`/${locale}/dashboard`);
@@ -210,7 +208,7 @@ export function PricingSection({ dict, locale }: PricingProps) {
                 };
 
                 return (
-                  <button 
+                  <button
                     onClick={handleCheckout}
                     disabled={payLoading}
                     className="w-full flex items-center justify-center gap-2 py-4 px-6 bg-gray-900 hover:bg-gray-800 text-white rounded-xl font-bold text-lg transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"

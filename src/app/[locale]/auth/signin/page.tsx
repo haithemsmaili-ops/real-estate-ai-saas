@@ -1,4 +1,5 @@
 'use client';
+
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { getDictionary } from '@/lib/i18n/get-dictionary';
@@ -28,12 +29,12 @@ export default function SignInPage() {
 
   const t = dict?.auth || {};
 
-  // تسجيل الدخول مع جوجل
+  // تسجيل الدخول مع جوجل مع التوجيه المباشر للصفحة الرئيسية
   const handleGoogleSignIn = async () => {
     setLoading(true);
     setError('');
     try {
-      await signIn('google', { callbackUrl: `/${lang}/dashboard` });
+      await signIn('google', { callbackUrl: `/${lang}` });
     } catch (err: any) {
       console.error(err);
       setError(isAr ? 'فشل تسجيل الدخول مع Google' : 'Google Sign-In failed');
@@ -61,7 +62,7 @@ export default function SignInPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ firstName, lastName, email, password }),
         });
-        
+
         const registerData = await registerRes.json();
         if (!registerRes.ok) {
           throw new Error(registerData.error || (isAr ? 'فشل إنشاء الحساب' : 'Failed to register'));
@@ -79,8 +80,8 @@ export default function SignInPage() {
         throw new Error(result.error);
       }
 
-      // التوجيه فوراً إلى لوحة التحكم بعد نجاح الدخول/الإنشاء
-      router.push(`/${lang}/dashboard`);
+      // التوجيه فوراً إلى الصفحة الرئيسية بعد نجاح الدخول/الإنشاء
+      router.push(`/${lang}`);
     } catch (err: any) {
       console.error(err);
       setError(err.message || (isAr ? 'حدث خطأ غير متوقع' : 'An error occurred'));

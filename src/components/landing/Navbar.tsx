@@ -5,6 +5,7 @@ import type { Locale } from "@/lib/i18n/config";
 import { LanguageToggle } from "./LanguageToggle";
 import { Button } from "@/components/ui/Button";
 import { Building2 } from "lucide-react";
+import { UserMenu } from "@/components/UserMenu";
 
 interface NavbarProps {
   dict: Dictionary;
@@ -17,7 +18,7 @@ export function Navbar({ dict, locale, showPricing = true }: NavbarProps) {
     <header className="sticky top-0 z-50 border-b border-surface-200/80 bg-white/85 backdrop-blur-xl shadow-md glass-bg">
       <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
 
-        {/* رابط الشعار واسم الموقع الذي يعيدك للصفحة الرئيسية حسب اللغة */}
+        {/* رابط الشعار واسم الموقع */}
         <Link href={`/${locale}`} className="flex items-center gap-2.5">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-600 text-white shadow-sm">
             <Building2 className="h-5 w-5" />
@@ -51,14 +52,12 @@ export function Navbar({ dict, locale, showPricing = true }: NavbarProps) {
           </Link>
         </div>
 
-        {/* أزرار اللغة والطلب والمصادقة */}
+        {/* أزرار اللغة، حساب المستخدم، والطلب */}
         <div className="flex items-center gap-3">
           <LanguageToggle locale={locale} />
 
-          {/* تم تعديل الرابط هنا ليدعم اللغة الحالية ديناميكياً */}
-          <Link href={`/${locale}/auth/signin`} className="hidden sm:block">
-            <Button size="sm" variant="outline">Sign In</Button>
-          </Link>
+          {/* قائمة حساب المستخدم / زر تسجيل الدخول */}
+          <UserMenu locale={locale} />
 
           <Link href={`/${locale}#demo`} className="hidden sm:block">
             <Button size="sm">{dict.nav.requestDemo}</Button>

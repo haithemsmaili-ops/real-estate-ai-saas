@@ -227,9 +227,8 @@ export default function LeadsPage() {
                         </span>
                         <div className="w-16 bg-surface-100 rounded-full h-1.5 overflow-hidden">
                           <div
-                            className={`h-full rounded-full ${
-                              lead.intentScore >= 80 ? "bg-amber-500" : lead.intentScore >= 50 ? "bg-blue-500" : "bg-surface-300"
-                            }`}
+                            className={`h-full rounded-full ${lead.intentScore >= 80 ? "bg-amber-500" : lead.intentScore >= 50 ? "bg-blue-500" : "bg-surface-300"
+                              }`}
                             style={{ width: `${lead.intentScore}%` }}
                           />
                         </div>

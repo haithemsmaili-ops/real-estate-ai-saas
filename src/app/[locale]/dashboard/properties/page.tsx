@@ -86,7 +86,7 @@ export default function PropertiesPage() {
       setPrice("");
       setLocation("");
       setStatus("available");
-      
+
       // Refresh list
       fetchProperties();
     } catch (err: any) {
@@ -186,22 +186,20 @@ export default function PropertiesPage() {
                 <button
                   type="button"
                   onClick={() => setType("sale")}
-                  className={`py-2 px-3 text-sm font-semibold rounded-xl border text-center transition-all ${
-                    type === "sale"
+                  className={`py-2 px-3 text-sm font-semibold rounded-xl border text-center transition-all ${type === "sale"
                       ? "bg-brand-50 border-brand-500 text-brand-700"
                       : "bg-white border-surface-200 text-surface-600 hover:bg-surface-50"
-                  }`}
+                    }`}
                 >
                   {isAr ? "للبيع" : "For Sale"}
                 </button>
                 <button
                   type="button"
                   onClick={() => setType("rent")}
-                  className={`py-2 px-3 text-sm font-semibold rounded-xl border text-center transition-all ${
-                    type === "rent"
+                  className={`py-2 px-3 text-sm font-semibold rounded-xl border text-center transition-all ${type === "rent"
                       ? "bg-brand-50 border-brand-500 text-brand-700"
                       : "bg-white border-surface-200 text-surface-600 hover:bg-surface-50"
-                  }`}
+                    }`}
                 >
                   {isAr ? "للإيجار" : "For Rent"}
                 </button>

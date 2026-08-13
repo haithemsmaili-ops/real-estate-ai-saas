@@ -30,6 +30,7 @@ export interface UserRecord {
 
 export interface PropertyRecord {
   id: string;
+  userEmail: string; // ربط العقار ببريد المستخدم
   title: string;
   type: 'sale' | 'rent';
   price: string;
@@ -40,6 +41,7 @@ export interface PropertyRecord {
 
 export interface LeadRecord {
   id: string;
+  userEmail: string; // ربط العميل ببريد المستخدم
   tenantId: string;
   name: string;
   email?: string;
@@ -51,92 +53,15 @@ export interface LeadRecord {
   createdAt: string;
 }
 
-const seedLeads: LeadRecord[] = [
-  {
-    id: "lead_1",
-    tenantId: "demo",
-    name: "Ahmed Al-Rashid",
-    phone: "+971501234567",
-    source: "whatsapp",
-    status: "qualified",
-    intentScore: 87,
-    locale: "ar",
-    createdAt: new Date("2026-07-26").toISOString()
-  },
-  {
-    id: "lead_2",
-    tenantId: "demo",
-    name: "Sarah Mitchell",
-    email: "sarah.m@email.com",
-    source: "email",
-    status: "pending",
-    intentScore: 62,
-    locale: "en",
-    createdAt: new Date("2026-07-25").toISOString()
-  },
-  {
-    id: "lead_3",
-    tenantId: "demo",
-    name: "James Chen",
-    phone: "+14165551234",
-    source: "sms",
-    status: "new",
-    intentScore: 45,
-    locale: "en",
-    createdAt: new Date("2026-07-24").toISOString()
-  },
-  {
-    id: "lead_4",
-    tenantId: "demo",
-    name: "Fatima Hassan",
-    phone: "+966501112233",
-    source: "whatsapp",
-    status: "converted",
-    intentScore: 95,
-    locale: "ar",
-    createdAt: new Date("2026-07-23").toISOString()
-  }
-];
-
-const seedProperties: PropertyRecord[] = [
-  {
-    id: "prop_1",
-    title: "فيلا فاخرة مع مسبح في المرادية",
-    type: "sale",
-    price: "45,000,000 دج",
-    location: "المرادية، الجزائر",
-    status: "available",
-    createdAt: new Date("2026-08-01").toISOString()
-  },
-  {
-    id: "prop_2",
-    title: "شقة حديثة F3 مطلة على البحر",
-    type: "rent",
-    price: "85,000 دج / شهرياً",
-    location: "عين بنيان، الجزائر",
-    status: "available",
-    createdAt: new Date("2026-08-05").toISOString()
-  },
-  {
-    id: "prop_3",
-    title: "مكتب تجاري مجهز بالكامل",
-    type: "rent",
-    price: "150,000 دج / شهرياً",
-    location: "باب الزوار، الجزائر",
-    status: "rented",
-    createdAt: new Date("2026-08-10").toISOString()
-  }
-];
-
-// In-memory state cache as a absolute fallback
+// In-memory state cache as an absolute fallback
 const inMemoryCache: Record<string, any[]> = {
   'users.json': [],
-  'properties.json': seedProperties,
-  'leads.json': seedLeads
+  'properties.json': [],
+  'leads.json': []
 };
 
 // Safe DB reader
-function readDbFile<T>(filename: string, defaultSeed: T[]): T[] {
+function readDbFile<T>(filename: string, defaultSeed: T[] = []): T[] {
   const dbDir = getDbDir();
   const filePath = path.join(dbDir, filename);
 
@@ -152,7 +77,7 @@ function readDbFile<T>(filename: string, defaultSeed: T[]): T[] {
     console.warn(`[DB] Read warning for ${filePath}:`, e);
   }
 
-  // 2. Fallback to reading source static directory (read-only safe)
+  // 2. Fallback to reading source static directory
   try {
     const sourcePath = path.join(SOURCE_DIR, filename);
     if (fs.existsSync(sourcePath)) {
@@ -165,13 +90,12 @@ function readDbFile<T>(filename: string, defaultSeed: T[]): T[] {
     console.warn(`[DB] Source template read warning for ${filename}:`, e);
   }
 
-  // 3. Fallback to in-memory cache or default seeds
+  // 3. Fallback to in-memory cache or empty default
   return (inMemoryCache[filename] as T[]) || defaultSeed;
 }
 
 // Safe DB writer
 function writeDbFile<T>(filename: string, data: T[]) {
-  // Always update memory cache first
   inMemoryCache[filename] = data;
 
   try {
@@ -182,7 +106,7 @@ function writeDbFile<T>(filename: string, data: T[]) {
     const filePath = path.join(dbDir, filename);
     fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
   } catch (e) {
-    console.warn(`[DB] EROFS / Write ignored safely on ${filename}. Falling back to memory:`, e);
+    console.warn(`[DB] Write ignored safely on ${filename}. Falling back to memory:`, e);
   }
 }
 
@@ -197,6 +121,7 @@ export const jsonDb = {
   },
 
   getUserByEmail(email: string): UserRecord | undefined {
+    if (!email) return undefined;
     return this.getUsers().find(u => u.email.toLowerCase() === email.toLowerCase());
   },
 
@@ -217,22 +142,30 @@ export const jsonDb = {
   },
 
   // --- PROPERTIES ---
-  getProperties(): PropertyRecord[] {
-    return readDbFile<PropertyRecord>('properties.json', seedProperties);
+  getProperties(email?: string): PropertyRecord[] {
+    const properties = readDbFile<PropertyRecord>('properties.json', []);
+    if (!email) return properties;
+    return properties.filter(p => p.userEmail?.toLowerCase() === email.toLowerCase());
   },
 
   saveProperties(properties: PropertyRecord[]) {
     writeDbFile('properties.json', properties);
   },
 
-  addProperty(property: PropertyRecord) {
-    const properties = this.getProperties();
-    properties.push(property);
+  addProperty(property: Omit<PropertyRecord, 'id' | 'createdAt'> & { userEmail: string }) {
+    const properties = readDbFile<PropertyRecord>('properties.json', []);
+    const newProperty: PropertyRecord = {
+      ...property,
+      id: 'prop_' + Date.now(),
+      createdAt: new Date().toISOString()
+    };
+    properties.push(newProperty);
     this.saveProperties(properties);
+    return newProperty;
   },
 
   updateProperty(id: string, updates: Partial<PropertyRecord>): PropertyRecord | undefined {
-    const properties = this.getProperties();
+    const properties = readDbFile<PropertyRecord>('properties.json', []);
     const idx = properties.findIndex(p => p.id === id);
     if (idx === -1) return undefined;
 
@@ -242,17 +175,25 @@ export const jsonDb = {
   },
 
   // --- LEADS ---
-  getLeads(): LeadRecord[] {
-    return readDbFile<LeadRecord>('leads.json', seedLeads);
+  getLeads(email?: string): LeadRecord[] {
+    const leads = readDbFile<LeadRecord>('leads.json', []);
+    if (!email) return leads;
+    return leads.filter(l => l.userEmail?.toLowerCase() === email.toLowerCase());
   },
 
   saveLeads(leads: LeadRecord[]) {
     writeDbFile('leads.json', leads);
   },
 
-  addLead(lead: LeadRecord) {
-    const leads = this.getLeads();
-    leads.push(lead);
+  addLead(lead: Omit<LeadRecord, 'id' | 'createdAt'> & { userEmail: string }) {
+    const leads = readDbFile<LeadRecord>('leads.json', []);
+    const newLead: LeadRecord = {
+      ...lead,
+      id: 'lead_' + Date.now(),
+      createdAt: new Date().toISOString()
+    };
+    leads.push(newLead);
     this.saveLeads(leads);
+    return newLead;
   }
 };

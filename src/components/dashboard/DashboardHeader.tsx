@@ -6,6 +6,7 @@ import { siteConfig } from "@/config/site";
 import type { Dictionary } from "@/lib/i18n/get-dictionary";
 import type { Locale } from "@/lib/i18n/config";
 import { LanguageToggle } from "@/components/landing/LanguageToggle";
+import { UserMenu } from "@/components/UserMenu";
 import { Bell, Building2 } from "lucide-react";
 
 interface DashboardHeaderProps {
@@ -17,13 +18,13 @@ export function DashboardHeader({ dict, locale }: DashboardHeaderProps) {
   const pathname = usePathname();
 
   // تحديد اللغة الحالية بدقة لضمان تحويل صحيح للصفحة الرئيسية
-  const currentLang = locale || pathname.split("/")[1] || "ar";
+  const currentLang = (locale || pathname.split("/")[1] || "ar") as Locale;
   const homePath = `/${currentLang}`;
 
   return (
     <header className="flex h-16 items-center justify-between border-b border-surface-200 bg-white px-6">
       <div className="flex items-center gap-6">
-        {/* رابط اللوجو والاسم للعودة للصفحة الرئيسية - مضمون التوجيه */}
+        {/* رابط اللوجو والاسم للعودة للصفحة الرئيسية */}
         <Link
           href={homePath}
           className="flex items-center gap-2.5 transition-transform hover:scale-105 active:scale-95 cursor-pointer group"
@@ -57,9 +58,9 @@ export function DashboardHeader({ dict, locale }: DashboardHeaderProps) {
           <Bell className="h-5 w-5" />
           <span className="absolute end-1.5 top-1.5 h-2 w-2 rounded-full bg-brand-500" />
         </button>
-        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-100 text-sm font-semibold text-brand-700">
-          AG
-        </div>
+
+        {/* قائمة حساب المستخدم والرمز التعبيري الديناميكي بدلاً من AG */}
+        <UserMenu locale={currentLang} />
       </div>
     </header>
   );
