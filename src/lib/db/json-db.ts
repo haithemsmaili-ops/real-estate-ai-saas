@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 
-// Determine if we are running in a serverless environment (Vercel)
+// Determine if running in Vercel / Production Serverless
 const isServerless = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production';
 
 // Helper to determine active database directory (using temp folder on Vercel)
@@ -128,7 +128,7 @@ const seedProperties: PropertyRecord[] = [
   }
 ];
 
-// In-memory state cache as a fallback if file operations fail completely
+// In-memory state cache as a absolute fallback
 const inMemoryCache: Record<string, any[]> = {
   'users.json': [],
   'properties.json': seedProperties,
@@ -140,52 +140,49 @@ function readDbFile<T>(filename: string, defaultSeed: T[]): T[] {
   const dbDir = getDbDir();
   const filePath = path.join(dbDir, filename);
 
+  // 1. Try reading from active target directory (/tmp or local)
   try {
     if (fs.existsSync(filePath)) {
       const content = fs.readFileSync(filePath, 'utf-8');
       const data = JSON.parse(content);
-      // Sync cache
       inMemoryCache[filename] = data;
       return data;
     }
   } catch (e) {
-    console.warn(`[DB] Failed to read from active file ${filePath}:`, e);
+    console.warn(`[DB] Read warning for ${filePath}:`, e);
   }
 
-  // Fallback to original source location if serverless
-  if (isServerless) {
+  // 2. Fallback to reading source static directory (read-only safe)
+  try {
     const sourcePath = path.join(SOURCE_DIR, filename);
-    try {
-      if (fs.existsSync(sourcePath)) {
-        const content = fs.readFileSync(sourcePath, 'utf-8');
-        const data = JSON.parse(content);
-        // Cache it & attempt writing to /tmp
-        inMemoryCache[filename] = data;
-        writeDbFile(filename, data);
-        return data;
-      }
-    } catch (e) {
-      console.warn(`[DB] Failed to read source template ${sourcePath}:`, e);
+    if (fs.existsSync(sourcePath)) {
+      const content = fs.readFileSync(sourcePath, 'utf-8');
+      const data = JSON.parse(content);
+      inMemoryCache[filename] = data;
+      return data;
     }
+  } catch (e) {
+    console.warn(`[DB] Source template read warning for ${filename}:`, e);
   }
 
+  // 3. Fallback to in-memory cache or default seeds
   return (inMemoryCache[filename] as T[]) || defaultSeed;
 }
 
 // Safe DB writer
 function writeDbFile<T>(filename: string, data: T[]) {
-  // Update memory cache
+  // Always update memory cache first
   inMemoryCache[filename] = data;
 
-  const dbDir = getDbDir();
   try {
+    const dbDir = getDbDir();
     if (!fs.existsSync(dbDir)) {
       fs.mkdirSync(dbDir, { recursive: true });
     }
     const filePath = path.join(dbDir, filename);
     fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
   } catch (e) {
-    console.error(`[DB] EROFS / Write error on ${filename}. Defaulting to in-memory storage:`, e);
+    console.warn(`[DB] EROFS / Write ignored safely on ${filename}. Falling back to memory:`, e);
   }
 }
 
@@ -213,7 +210,7 @@ export const jsonDb = {
     const users = this.getUsers();
     const idx = users.findIndex(u => u.email.toLowerCase() === email.toLowerCase());
     if (idx === -1) return undefined;
-    
+
     users[idx] = { ...users[idx], ...updates };
     this.saveUsers(users);
     return users[idx];
