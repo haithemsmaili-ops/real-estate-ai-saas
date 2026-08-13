@@ -8,7 +8,7 @@ import { RequestDemoCTA } from "@/components/landing/RequestDemoCTA";
 import Footer from "@/components/landing/Footer";
 import { ClientLandingWrapper } from "@/components/landing/ClientLandingWrapper";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/...nextauth/route";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { jsonDb } from "@/lib/db/json-db";
 
 interface HomePageProps {
