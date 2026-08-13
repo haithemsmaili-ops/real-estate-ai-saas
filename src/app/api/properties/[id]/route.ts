@@ -3,10 +3,10 @@ import { jsonDb } from "@/lib/db/json-db";
 
 export async function DELETE(
     req: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const { id } = params;
+        const { id } = await params;
         const properties = jsonDb.getProperties();
         const filtered = properties.filter((p) => p.id !== id);
         jsonDb.saveProperties(filtered);
