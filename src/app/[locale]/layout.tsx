@@ -5,6 +5,7 @@ import {
   localeDirection,
   type Locale,
 } from "@/lib/i18n/config";
+import { Providers } from "@/components/Providers";
 import "../globals.css";
 
 interface LocaleLayoutProps {
@@ -32,9 +33,11 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} dir={dir} className="h-full">
       <body className="h-full bg-surface-50 text-surface-900 antialiased font-sans">
-        <div className="flex min-h-full flex-1 flex-col">
-          {children}
-        </div>
+        <Providers>
+          <div className="flex min-h-full flex-1 flex-col">
+            {children}
+          </div>
+        </Providers>
       </body>
     </html>
   );
