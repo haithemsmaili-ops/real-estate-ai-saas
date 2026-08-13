@@ -1,44 +1,41 @@
-import { NextResponse } from 'next/server';
-import { jsonDb } from '@/lib/db/json-db';
+import { NextRequest, NextResponse } from "next/server";
+import { jsonDb } from "@/lib/db/json-db";
+import { getServerSession } from "next-auth";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    const leads = jsonDb.getLeads();
+    const session = await getServerSession();
+    const userEmail = session?.user?.email || "";
+
+    const leads = jsonDb.getLeads(userEmail);
     return NextResponse.json(leads);
   } catch (error) {
-    console.error('Error fetching leads:', error);
-    return NextResponse.json({ error: 'Failed to fetch leads' }, { status: 500 });
+    return NextResponse.json({ error: "Failed to fetch leads" }, { status: 500 });
   }
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
+    const session = await getServerSession();
+    const userEmail = session?.user?.email || "anonymous@propai.com";
+
     const body = await req.json();
-    // Accept lead fields (can be sent from n8n chatbot)
-    const { tenantId = 'demo', name, email, phone, source = 'chatbot', status = 'new', intentScore = 50, locale = 'ar' } = body;
 
-    if (!name) {
-      return NextResponse.json({ error: 'Lead name is required' }, { status: 400 });
-    }
-
-    const newLead = {
-      id: 'lead_' + Math.random().toString(36).substr(2, 9),
-      tenantId,
-      name,
-      email,
-      phone,
-      source,
-      status,
-      intentScore: Number(intentScore) || 50,
-      locale,
-      createdAt: new Date().toISOString()
-    };
-
-    jsonDb.addLead(newLead);
+    const newLead = jsonDb.addLead({
+      tenantId: body.tenantId || "default",
+      name: body.name || "عميل جديد",
+      email: body.email || "",
+      phone: body.phone || "",
+      source: body.source || "web",
+      status: body.status || "new",
+      intentScore: body.intentScore || 50,
+      locale: body.locale || "ar",
+      userEmail: userEmail, // إضافة حقل userEmail المطلوب
+    });
 
     return NextResponse.json({ success: true, lead: newLead });
   } catch (error) {
-    console.error('Error adding lead:', error);
-    return NextResponse.json({ error: 'Failed to add lead' }, { status: 500 });
+    console.error(error);
+    return NextResponse.json({ error: "Failed to create lead" }, { status: 500 });
   }
 }
