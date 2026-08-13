@@ -1,0 +1,46 @@
+[
+  {
+    "id": "lead_1",
+    "tenantId": "demo",
+    "name": "Ahmed Al-Rashid",
+    "phone": "+971501234567",
+    "source": "whatsapp",
+    "status": "qualified",
+    "intentScore": 87,
+    "locale": "ar",
+    "createdAt": "2026-07-26T00:00:00.000Z"
+  },
+  {
+    "id": "lead_2",
+    "tenantId": "demo",
+    "name": "Sarah Mitchell",
+    "email": "sarah.m@email.com",
+    "source": "email",
+    "status": "pending",
+    "intentScore": 62,
+    "locale": "en",
+    "createdAt": "2026-07-25T00:00:00.000Z"
+  },
+  {
+    "id": "lead_3",
+    "tenantId": "demo",
+    "name": "James Chen",
+    "phone": "+14165551234",
+    "source": "sms",
+    "status": "new",
+    "intentScore": 45,
+    "locale": "en",
+    "createdAt": "2026-07-24T00:00:00.000Z"
+  },
+  {
+    "id": "lead_4",
+    "tenantId": "demo",
+    "name": "Fatima Hassan",
+    "phone": "+966501112233",
+    "source": "whatsapp",
+    "status": "converted",
+    "intentScore": 95,
+    "locale": "ar",
+    "createdAt": "2026-07-23T00:00:00.000Z"
+  }
+]

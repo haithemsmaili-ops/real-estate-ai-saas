@@ -22,11 +22,8 @@ interface DashboardSidebarProps {
 
 const navItems = [
   { key: "overview" as const, icon: LayoutDashboard, href: "" },
+  { key: "properties" as const, icon: Building2, href: "/properties" },
   { key: "leads" as const, icon: Users, href: "/leads" },
-  { key: "channels" as const, icon: MessageSquare, href: "/channels" },
-  { key: "catalog" as const, icon: FileText, href: "/catalog" },
-  { key: "documents" as const, icon: FileText, href: "/documents" },
-  { key: "settings" as const, icon: Settings, href: "/settings" },
 ];
 
 export function DashboardSidebar({ dict, locale }: DashboardSidebarProps) {

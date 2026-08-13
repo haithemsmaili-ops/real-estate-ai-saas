@@ -3,7 +3,9 @@
 import { useState } from "react";
 import type { Dictionary } from "@/lib/i18n/get-dictionary";
 import type { Locale } from "@/lib/i18n/config";
-import { Check, Zap, Crown, ShieldCheck, X, CreditCard } from "lucide-react";
+import { Check, Zap, Crown, ShieldCheck, X, CreditCard, Loader2 } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 interface PricingProps {
   dict: Dictionary;
@@ -172,13 +174,61 @@ export function PricingSection({ dict, locale }: PricingProps) {
               )}
 
               {/* زر الدفع النهائي */}
-              <button 
-                onClick={() => alert("سيتم توجيه العميل لبوابة الدفع هنا...")}
-                className="w-full flex items-center justify-center gap-2 py-4 px-6 bg-gray-900 hover:bg-gray-800 text-white rounded-xl font-bold text-lg transition-colors shadow-lg"
-              >
-                <CreditCard className="w-6 h-6" />
-                المتابعة لإتمام الدفع الآمن
-              </button>
+              {(() => {
+                const { data: session, status } = useSession();
+                const router = useRouter();
+                const [payLoading, setPayLoading] = useState(false);
+
+                const handleCheckout = async () => {
+                  if (status !== "authenticated" || !session?.user) {
+                    alert(locale === "ar" ? "يرجى تسجيل الدخول أو إنشاء حساب أولاً لإتمام عملية الاشتراك." : "Please sign in or create an account first to complete the subscription.");
+                    router.push(`/${locale}/auth/signin?plan=${selectedPlan}`);
+                    return;
+                  }
+                  
+                  setPayLoading(true);
+                  try {
+                    const res = await fetch("/api/payment/success", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ email: session.user.email, plan: selectedPlan }),
+                    });
+                    const data = await res.json();
+                    if (!res.ok) {
+                      throw new Error(data.error || "خطأ أثناء إرسال الدفع");
+                    }
+                    
+                    alert(locale === "ar" ? "تم الدفع بنجاح! جاري توجيهك إلى لوحة التحكم." : "Payment successful! Redirecting to dashboard.");
+                    setSelectedPlan(null);
+                    router.push(`/${locale}/dashboard`);
+                  } catch (err: any) {
+                    console.error(err);
+                    alert(locale === "ar" ? "فشلت عملية الدفع. يرجى المحاولة لاحقاً." : "Payment failed. Please try again.");
+                  } finally {
+                    setPayLoading(false);
+                  }
+                };
+
+                return (
+                  <button 
+                    onClick={handleCheckout}
+                    disabled={payLoading}
+                    className="w-full flex items-center justify-center gap-2 py-4 px-6 bg-gray-900 hover:bg-gray-800 text-white rounded-xl font-bold text-lg transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  >
+                    {payLoading ? (
+                      <>
+                        <Loader2 className="w-6 h-6 animate-spin" />
+                        <span>{locale === "ar" ? "جاري معالجة الدفع..." : "Processing Payment..."}</span>
+                      </>
+                    ) : (
+                      <>
+                        <CreditCard className="w-6 h-6" />
+                        <span>{locale === "ar" ? "المتابعة لإتمام الدفع الآمن" : "Proceed to Secure Payment"}</span>
+                      </>
+                    )}
+                  </button>
+                );
+              })()}
             </div>
           </div>
         </div>

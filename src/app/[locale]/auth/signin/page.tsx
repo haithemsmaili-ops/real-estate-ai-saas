@@ -5,18 +5,18 @@ import { getDictionary } from '@/lib/i18n/get-dictionary';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import Link from 'next/link';
-// إذا كنت تستخدم NextAuth تفعل هذا السطر:
-// import { signIn } from 'next-auth/react';
+import { signIn } from 'next-auth/react';
 
 export default function SignInPage() {
   const params = useParams();
   const router = useRouter();
-  const lang = (params?.lang as string) || 'ar';
+  const lang = (params?.lang as string) || (params?.locale as string) || 'ar';
   const isAr = lang === 'ar';
 
   const [dict, setDict] = useState<any>(null);
   const [isRegister, setIsRegister] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (lang) {
@@ -31,15 +31,12 @@ export default function SignInPage() {
   // تسجيل الدخول مع جوجل
   const handleGoogleSignIn = async () => {
     setLoading(true);
+    setError('');
     try {
-      // 1. إذا كنت تستخدم NextAuth:
-      // await signIn('google', { callbackUrl: `/${lang}/dashboard` });
-
-      // 2. توجيه مؤقت للوحة التحكم للتحقق من عمل الواجهة:
-      router.push(`/${lang}/dashboard`);
-    } catch (error) {
-      console.error(error);
-    } finally {
+      await signIn('google', { callbackUrl: `/${lang}/dashboard` });
+    } catch (err: any) {
+      console.error(err);
+      setError(isAr ? 'فشل تسجيل الدخول مع Google' : 'Google Sign-In failed');
       setLoading(false);
     }
   };
@@ -48,25 +45,45 @@ export default function SignInPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
+    setError('');
 
     const formData = new FormData(e.currentTarget);
-    const email = formData.get('email');
-    const password = formData.get('password');
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+    const firstName = formData.get('firstName') as string;
+    const lastName = formData.get('lastName') as string;
 
     try {
       if (isRegister) {
-        // منطق إنشاء حساب جديد (API Call)
-        console.log('Registering:', email);
-      } else {
-        // منطق تسجيل الدخول
-        console.log('Signing in:', email);
+        // منطق إنشاء حساب جديد
+        const registerRes = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ firstName, lastName, email, password }),
+        });
+        
+        const registerData = await registerRes.json();
+        if (!registerRes.ok) {
+          throw new Error(registerData.error || (isAr ? 'فشل إنشاء الحساب' : 'Failed to register'));
+        }
+      }
+
+      // تسجيل الدخول بالاعتمادات
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        throw new Error(result.error);
       }
 
       // التوجيه فوراً إلى لوحة التحكم بعد نجاح الدخول/الإنشاء
       router.push(`/${lang}/dashboard`);
-    } catch (error) {
-      console.error(error);
-    } finally {
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || (isAr ? 'حدث خطأ غير متوقع' : 'An error occurred'));
       setLoading(false);
     }
   };
@@ -84,6 +101,12 @@ export default function SignInPage() {
               : (t?.signInTitle || (isAr ? "تسجيل الدخول" : "Sign In"))}
           </h2>
         </div>
+
+        {error && (
+          <div className="mb-4 rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-600 text-center">
+            {error}
+          </div>
+        )}
 
         {/* زر جوجل */}
         <Button
@@ -143,7 +166,10 @@ export default function SignInPage() {
         <div className="mt-4 text-center text-sm text-surface-600">
           <button
             type="button"
-            onClick={() => setIsRegister(!isRegister)}
+            onClick={() => {
+              setIsRegister(!isRegister);
+              setError('');
+            }}
             className="underline hover:text-brand-600 cursor-pointer"
           >
             {isRegister
