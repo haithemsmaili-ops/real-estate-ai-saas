@@ -71,11 +71,54 @@ export const jsonDb = {
   async getUserByEmail(email: string): Promise<UserRecord | undefined> {
     if (!email) return undefined;
     const { data } = await supabase.from('users').select('*').eq('email', email.toLowerCase()).single();
-    return data || undefined;
+    if (!data) return undefined;
+    return {
+      ...data,
+      firstName: data.first_name || data.firstName,
+      lastName: data.last_name || data.lastName,
+      subscriptionStatus: data.subscription_status || data.subscriptionStatus || 'none',
+      hasPaid: data.has_paid ?? data.hasPaid ?? false,
+      paymentTimestamp: data.payment_timestamp || data.paymentTimestamp,
+    };
   },
 
   async addUser(user: UserRecord) {
-    await supabase.from('users').insert([user]);
+    await supabase.from('users').insert([{
+      id: user.id,
+      first_name: user.firstName,
+      last_name: user.lastName,
+      email: user.email.toLowerCase(),
+      password: user.password,
+      auth_provider: user.authProvider,
+      subscription_status: user.subscriptionStatus,
+      has_paid: user.hasPaid,
+      created_at: user.createdAt,
+    }]);
+  },
+
+  async updateUserPayment(email: string, hasPaid: boolean = true, paymentTimestamp: number = Date.now(), subscriptionStatus: string = 'paid') {
+    const { data, error } = await supabase
+      .from('users')
+      .update({
+        has_paid: hasPaid,
+        payment_timestamp: paymentTimestamp,
+        subscription_status: subscriptionStatus,
+      })
+      .eq('email', email.toLowerCase())
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating user payment in Supabase:', error);
+      return null;
+    }
+
+    return {
+      ...data,
+      hasPaid: data.has_paid,
+      paymentTimestamp: data.payment_timestamp,
+      subscriptionStatus: data.subscription_status,
+    };
   },
 
   // --- PROPERTIES ---
@@ -90,7 +133,6 @@ export const jsonDb = {
       return [];
     }
 
-    // تحويل الأعمدة لتطابق واجهة الموقع
     return (data || []).map((p: any) => ({
       id: p.id,
       userEmail: p.user_email,

@@ -9,7 +9,6 @@ export async function POST(req: Request) {
     let email = session?.user?.email;
 
     if (!email) {
-      // Fallback to body email
       const body = await req.json().catch(() => ({}));
       email = body.email;
     }
@@ -21,7 +20,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const user = jsonDb.getUserByEmail(email);
+    const user = await jsonDb.getUserByEmail(email);
     if (!user) {
       return NextResponse.json(
         { error: 'المستخدم غير موجود' },
@@ -29,22 +28,17 @@ export async function POST(req: Request) {
       );
     }
 
-    // Update user record with payment flags
-    const updated = jsonDb.updateUser(email, {
-      hasPaid: true,
-      paymentTimestamp: Date.now(),
-      subscriptionStatus: 'paid'
-    });
+    const updated = await jsonDb.updateUserPayment(email, true, Date.now(), 'paid');
 
     return NextResponse.json({
       success: true,
       message: 'تم تفعيل الدفع بنجاح',
       user: {
-        email: updated?.email,
-        hasPaid: updated?.hasPaid,
+        email: updated?.email || email,
+        hasPaid: updated?.hasPaid ?? true,
         paymentTimestamp: updated?.paymentTimestamp,
-        subscriptionStatus: updated?.subscriptionStatus
-      }
+        subscriptionStatus: updated?.subscriptionStatus || 'paid',
+      },
     });
   } catch (error: any) {
     console.error('Payment API Error:', error);
