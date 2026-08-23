@@ -14,8 +14,8 @@ export async function POST(req: Request) {
       );
     }
 
-    // Check if user already exists
-    const existingUser = jsonDb.getUserByEmail(email);
+    // إضافة await لجلب البيانات بانتظار الـ Promise
+    const existingUser = await jsonDb.getUserByEmail(email);
     if (existingUser) {
       return NextResponse.json(
         { error: 'البريد الإلكتروني مسجل بالفعل' },
@@ -38,7 +38,8 @@ export async function POST(req: Request) {
       createdAt: new Date().toISOString(),
     };
 
-    jsonDb.addUser(newUser);
+    // إضافة await لحفظ المستخدم في Supabase
+    await jsonDb.addUser(newUser);
 
     return NextResponse.json({
       success: true,
