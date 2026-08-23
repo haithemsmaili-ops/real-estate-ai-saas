@@ -20,7 +20,7 @@ export const authOptions: NextAuthOptions = {
                 if (!credentials?.email || !credentials?.password) {
                     throw new Error("يرجى إدخال البريد الإلكتروني وكلمة المرور");
                 }
-                const user = jsonDb.getUserByEmail(credentials.email);
+                const user = await jsonDb.getUserByEmail(credentials.email);
                 if (!user) {
                     throw new Error("البريد الإلكتروني غير مسجل");
                 }
@@ -49,12 +49,12 @@ export const authOptions: NextAuthOptions = {
             if (account?.provider === "google") {
                 const email = user.email;
                 if (email) {
-                    const existingUser = jsonDb.getUserByEmail(email);
+                    const existingUser = await jsonDb.getUserByEmail(email);
                     if (!existingUser) {
                         const nameParts = (user.name || "").split(" ");
                         const firstName = nameParts[0] || "Google";
                         const lastName = nameParts.slice(1).join(" ") || "User";
-                        jsonDb.addUser({
+                        await jsonDb.addUser({
                             id: user.id || "google_" + Math.random().toString(36).substr(2, 9),
                             firstName,
                             lastName,
@@ -83,7 +83,7 @@ export const authOptions: NextAuthOptions = {
                 token.paymentTimestamp = (user as any).paymentTimestamp;
             }
             if (token.email) {
-                const dbUser = jsonDb.getUserByEmail(token.email);
+                const dbUser = await jsonDb.getUserByEmail(token.email);
                 if (dbUser) {
                     token.id = dbUser.id;
                     token.firstName = dbUser.firstName;
