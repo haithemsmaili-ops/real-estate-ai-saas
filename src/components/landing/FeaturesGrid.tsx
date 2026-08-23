@@ -6,6 +6,7 @@ import {
   MessageSquare,
   ScanLine,
   Users,
+  Sparkles,
 } from "lucide-react";
 
 interface FeaturesGridProps {
@@ -32,13 +33,24 @@ const featureKeys = [
 
 export function FeaturesGrid({ dict }: FeaturesGridProps) {
   return (
-    <section id="features" className="bg-surface-50 py-24 sm:py-32">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section id="features" className="relative overflow-hidden bg-surface-950 py-24 sm:py-32">
+      {/* Background Ambient Glows & Grid */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute top-1/3 start-10 h-[500px] w-[500px] rounded-full bg-emerald-500/10 blur-[130px] animate-ambient-float" />
+        <div className="absolute bottom-10 end-10 h-[450px] w-[450px] rounded-full bg-cyan-500/10 blur-[120px] animate-ambient-float-reverse" />
+        <div className="absolute inset-0 bg-grid-mesh opacity-40" />
+      </div>
+
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-surface-900 sm:text-4xl">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-bold uppercase tracking-wider mb-4">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>AI Capabilities</span>
+          </div>
+          <h2 className="text-3xl font-extrabold tracking-tight sm:text-5xl bg-gradient-to-r from-white via-emerald-300 to-white bg-clip-text text-transparent">
             {dict.features.title}
           </h2>
-          <p className="mt-4 text-lg text-surface-600">
+          <p className="mt-4 text-lg text-surface-400">
             {dict.features.subtitle}
           </p>
         </div>
@@ -50,15 +62,15 @@ export function FeaturesGrid({ dict }: FeaturesGridProps) {
             return (
               <div
                 key={key}
-                className="group rounded-2xl border border-surface-200 bg-white p-8 shadow-sm transition-all duration-300 hover:border-brand-200 hover:shadow-lg hover:shadow-brand-100/50"
+                className="group relative rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-8 shadow-xl transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] hover:border-emerald-500/40 hover:bg-white/[0.06] hover:shadow-2xl hover:shadow-emerald-500/10 cursor-pointer"
               >
-                <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-600 transition-colors group-hover:bg-brand-600 group-hover:text-white">
-                  <Icon className="h-6 w-6" />
+                <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 text-emerald-400 transition-all duration-300 group-hover:bg-gradient-to-br group-hover:from-emerald-500 group-hover:to-cyan-500 group-hover:text-white group-hover:shadow-lg group-hover:shadow-emerald-500/30">
+                  <Icon className="h-7 w-7" />
                 </div>
-                <h3 className="text-lg font-semibold text-surface-900">
+                <h3 className="text-xl font-bold text-white transition-colors group-hover:text-emerald-300">
                   {feature.title}
                 </h3>
-                <p className="mt-2 text-sm leading-6 text-surface-600">
+                <p className="mt-3 text-sm leading-relaxed text-surface-400">
                   {feature.description}
                 </p>
               </div>

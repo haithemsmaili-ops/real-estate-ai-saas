@@ -49,13 +49,13 @@ export function LanguageToggle({ locale }: LanguageToggleProps) {
       <button
         ref={buttonRef}
         onClick={toggleOpen}
-        className="flex items-center gap-1 rounded-xl border border-surface-200 bg-white p-1 shadow-sm hover:bg-surface-50"
+        className="flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm px-2.5 py-1.5 shadow-sm hover:bg-white/10 transition-all"
         aria-haspopup="true"
         aria-expanded={open}
         type="button"
       >
-        <Globe className="h-4 w-4 text-surface-400" aria-hidden />
-        <span className="text-sm font-medium text-surface-600">{locale.toUpperCase()}</span>
+        <Globe className="h-4 w-4 text-emerald-400" aria-hidden />
+        <span className="text-sm font-medium text-surface-300">{locale.toUpperCase()}</span>
       </button>
 
       {/* Dropdown menu */}
@@ -65,19 +65,21 @@ export function LanguageToggle({ locale }: LanguageToggleProps) {
           className={
             "absolute " +
             (isRTL ? "left-0 " : "right-0 ") +
-            "mt-2 w-32 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
+            "mt-2 w-36 origin-top-right rounded-xl bg-surface-900/95 backdrop-blur-xl shadow-2xl border border-white/10 ring-1 ring-emerald-500/10 focus:outline-none z-10"
           }
           onMouseLeave={closeMenu}
         >
-          <div className="py-1">
+          <div className="py-1.5">
             {(Object.keys(localeNames) as Locale[]).map((loc) => (
               <Link
                 key={loc}
                 href={switchLocale(loc)}
                 onClick={closeMenu}
                 className={cn(
-                  "block px-4 py-2 text-sm",
-                  loc === locale ? "bg-brand-600 text-white" : "text-surface-600 hover:bg-surface-50 hover:text-surface-900"
+                  "block px-4 py-2.5 text-sm font-medium transition-all",
+                  loc === locale
+                    ? "bg-gradient-to-r from-emerald-600/80 to-teal-600/80 text-white"
+                    : "text-surface-400 hover:bg-white/5 hover:text-emerald-400"
                 )}
                 aria-current={loc === locale ? "page" : undefined}
               >

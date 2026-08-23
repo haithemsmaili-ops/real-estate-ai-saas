@@ -59,7 +59,6 @@ export function LeadModal({
 
   const validatePhone = (phone: string) => {
     const cleanPhone = phone.replace(/\s+/g, "");
-    // Algerian phone numbers: starts with +213 or 0, followed by 5, 6, 7, 8, 9, then 8 digits
     const regex = /^(\+213|0)[5-9]\d{8}$/;
     return regex.test(cleanPhone);
   };
@@ -103,18 +102,18 @@ export function LeadModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm transition-opacity"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl transition-opacity"
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-md bg-white dark:bg-gray-900 rounded-3xl p-6 sm:p-8 shadow-2xl border border-gray-100 dark:border-gray-800 text-right dir-rtl animate-in fade-in zoom-in duration-200"
+        className="relative w-full max-w-md bg-surface-900/95 border border-white/15 rounded-3xl p-6 sm:p-8 shadow-[0_20px_70px_rgba(0,0,0,0.7)] text-right dir-rtl animate-fade-in-scale"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
         <button
           onClick={onClose}
           type="button"
-          className="absolute top-4 left-4 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
+          className="absolute top-4 left-4 p-2 text-surface-400 hover:text-white hover:bg-white/10 rounded-full transition-colors"
           aria-label="إغلاق"
         >
           <X className="w-5 h-5" />
@@ -122,19 +121,19 @@ export function LeadModal({
 
         {success ? (
           <div className="text-center py-6">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 mb-4">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400 mb-4 border border-emerald-500/30">
               <Check className="h-8 w-8" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            <h3 className="text-2xl font-bold text-white mb-2">
               تم استلام طلبك بنجاح!
             </h3>
-            <p className="text-gray-600 dark:text-gray-300 text-sm mb-6">
+            <p className="text-surface-300 text-sm mb-6">
               سيتواصل معك فريقنا خلال 24 ساعة لبدء التجربة المجانية.
             </p>
             <button
               onClick={onClose}
               type="button"
-              className="w-full py-3 px-6 bg-gray-900 hover:bg-gray-800 text-white font-medium rounded-xl transition-colors dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-white"
+              className="w-full py-3 px-6 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-bold rounded-xl transition-all shadow-lg shadow-emerald-500/25"
             >
               إغلاق
             </button>
@@ -142,13 +141,13 @@ export function LeadModal({
         ) : (
           <div>
             <div className="mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-2xl font-bold text-white">
                 احجز تجربة مجانية
               </h2>
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-sm text-surface-400">
                 يرجى ملء المعلومات أدناه لبدء التجربة.
                 {selectedPlan && (
-                  <span className="block mt-1 font-semibold text-blue-600 dark:text-blue-400">
+                  <span className="block mt-1 font-semibold text-emerald-400">
                     الخطة المحددة: {selectedPlan}
                   </span>
                 )}
@@ -156,14 +155,14 @@ export function LeadModal({
             </div>
 
             {errorMessage && (
-              <div className="mb-4 p-3 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-xs">
+              <div className="mb-4 p-3 rounded-xl bg-red-900/20 border border-red-800 text-red-300 text-xs">
                 {errorMessage}
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-xs font-medium text-surface-300 mb-1">
                   الاسم الكامل
                 </label>
                 <input
@@ -173,12 +172,12 @@ export function LeadModal({
                   placeholder="الاسم الكامل"
                   value={form.name}
                   onChange={handleChange}
-                  className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-surface-500 focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-400/20"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-xs font-medium text-surface-300 mb-1">
                   اسم الوكالة العقارية
                 </label>
                 <input
@@ -188,12 +187,12 @@ export function LeadModal({
                   placeholder="اسم الوكالة العقارية"
                   value={form.agency}
                   onChange={handleChange}
-                  className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-surface-500 focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-400/20"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-xs font-medium text-surface-300 mb-1">
                   رقم الهاتف (الجزائر)
                 </label>
                 <input
@@ -207,16 +206,16 @@ export function LeadModal({
                   className={`w-full rounded-xl border ${
                     phoneError
                       ? "border-red-500 focus:border-red-500 focus:ring-red-500/20"
-                      : "border-gray-300 dark:border-gray-700 focus:border-blue-500 focus:ring-blue-500/20"
-                  } bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 text-right`}
+                      : "border-white/15 focus:border-emerald-400 focus:ring-emerald-400/20"
+                  } bg-white/5 px-4 py-3 text-sm text-white placeholder:text-surface-500 focus:outline-none focus:ring-2 text-right`}
                 />
                 {phoneError && (
-                  <p className="mt-1 text-xs text-red-500">{phoneError}</p>
+                  <p className="mt-1 text-xs text-red-400">{phoneError}</p>
                 )}
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-xs font-medium text-surface-300 mb-1">
                   الولاية / المدينة
                 </label>
                 <input
@@ -226,7 +225,7 @@ export function LeadModal({
                   placeholder="الولاية"
                   value={form.city}
                   onChange={handleChange}
-                  className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-surface-500 focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-400/20"
                 />
               </div>
 
@@ -238,7 +237,7 @@ export function LeadModal({
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-6 shadow-lg shadow-blue-600/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-bold py-3.5 px-6 shadow-lg shadow-emerald-500/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   {loading ? (
                     <>
