@@ -1,26 +1,16 @@
-import fs from 'fs';
-import path from 'path';
-import os from 'os';
+import { createClient } from "@supabase/supabase-js";
 
-// Determine if running in Vercel / Production Serverless
-const isServerless = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 
-// Helper to determine active database directory (using temp folder on Vercel)
-const getDbDir = () => {
-  if (isServerless) {
-    return path.join(os.tmpdir(), 'propai-db');
-  }
-  return path.join(process.cwd(), 'src', 'lib', 'db', 'data');
-};
-
-const SOURCE_DIR = path.join(process.cwd(), 'src', 'lib', 'db', 'data');
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 export interface UserRecord {
   id: string;
   firstName: string;
   lastName: string;
   email: string;
-  password?: string; // stored hashed
+  password?: string;
   authProvider: 'google' | 'credentials';
   subscriptionStatus: 'none' | 'paid' | 'active';
   hasPaid: boolean;
@@ -30,7 +20,7 @@ export interface UserRecord {
 
 export interface PropertyRecord {
   id: string;
-  userEmail: string; // ربط العقار ببريد المستخدم
+  userEmail: string;
   title: string;
   description?: string;
   type: 'sale' | 'rent' | 'short_term';
@@ -59,7 +49,7 @@ export interface PropertyRecord {
 
 export interface LeadRecord {
   id: string;
-  userEmail: string; // ربط العميل ببريد المستخدم
+  userEmail: string;
   tenantId: string;
   name: string;
   email?: string;
@@ -71,155 +61,96 @@ export interface LeadRecord {
   createdAt: string;
 }
 
-// In-memory state cache as an absolute fallback
-const inMemoryCache: Record<string, any[]> = {
-  'users.json': [],
-  'properties.json': [],
-  'leads.json': []
-};
-
-// Safe DB reader
-function readDbFile<T>(filename: string, defaultSeed: T[] = []): T[] {
-  const dbDir = getDbDir();
-  const filePath = path.join(dbDir, filename);
-
-  // 1. Try reading from active target directory (/tmp or local)
-  try {
-    if (fs.existsSync(filePath)) {
-      const content = fs.readFileSync(filePath, 'utf-8');
-      const data = JSON.parse(content);
-      inMemoryCache[filename] = data;
-      return data;
-    }
-  } catch (e) {
-    console.warn(`[DB] Read warning for ${filePath}:`, e);
-  }
-
-  // 2. Fallback to reading source static directory
-  try {
-    const sourcePath = path.join(SOURCE_DIR, filename);
-    if (fs.existsSync(sourcePath)) {
-      const content = fs.readFileSync(sourcePath, 'utf-8');
-      const data = JSON.parse(content);
-      inMemoryCache[filename] = data;
-      return data;
-    }
-  } catch (e) {
-    console.warn(`[DB] Source template read warning for ${filename}:`, e);
-  }
-
-  // 3. Fallback to in-memory cache or empty default
-  return (inMemoryCache[filename] as T[]) || defaultSeed;
-}
-
-// Safe DB writer
-function writeDbFile<T>(filename: string, data: T[]) {
-  inMemoryCache[filename] = data;
-
-  try {
-    const dbDir = getDbDir();
-    if (!fs.existsSync(dbDir)) {
-      fs.mkdirSync(dbDir, { recursive: true });
-    }
-    const filePath = path.join(dbDir, filename);
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
-  } catch (e) {
-    console.warn(`[DB] Write ignored safely on ${filename}. Falling back to memory:`, e);
-  }
-}
-
 export const jsonDb = {
   // --- USERS ---
-  getUsers(): UserRecord[] {
-    return readDbFile<UserRecord>('users.json', []);
+  async getUsers(): Promise<UserRecord[]> {
+    const { data } = await supabase.from('users').select('*');
+    return data || [];
   },
 
-  saveUsers(users: UserRecord[]) {
-    writeDbFile('users.json', users);
-  },
-
-  getUserByEmail(email: string): UserRecord | undefined {
+  async getUserByEmail(email: string): Promise<UserRecord | undefined> {
     if (!email) return undefined;
-    return this.getUsers().find(u => u.email.toLowerCase() === email.toLowerCase());
+    const { data } = await supabase.from('users').select('*').eq('email', email.toLowerCase()).single();
+    return data || undefined;
   },
 
-  addUser(user: UserRecord) {
-    const users = this.getUsers();
-    users.push(user);
-    this.saveUsers(users);
-  },
-
-  updateUser(email: string, updates: Partial<UserRecord>): UserRecord | undefined {
-    const users = this.getUsers();
-    const idx = users.findIndex(u => u.email.toLowerCase() === email.toLowerCase());
-    if (idx === -1) return undefined;
-
-    users[idx] = { ...users[idx], ...updates };
-    this.saveUsers(users);
-    return users[idx];
+  async addUser(user: UserRecord) {
+    await supabase.from('users').insert([user]);
   },
 
   // --- PROPERTIES ---
-  getProperties(email?: string): PropertyRecord[] {
-    const properties = readDbFile<PropertyRecord>('properties.json', []);
-    if (!email) return properties;
-    return properties.filter(p => p.userEmail?.toLowerCase() === email.toLowerCase());
+  async getProperties(email?: string): Promise<PropertyRecord[]> {
+    let query = supabase.from('properties').select('*');
+    if (email) {
+      query = query.eq('user_email', email.toLowerCase());
+    }
+    const { data, error } = await query;
+    if (error) {
+      console.error("[Supabase Error]:", error);
+      return [];
+    }
+
+    // تحويل الأعمدة لتطابق واجهة الموقع
+    return (data || []).map((p: any) => ({
+      id: p.id,
+      userEmail: p.user_email,
+      title: p.title,
+      type: p.listing_type || 'sale',
+      listingType: p.listing_type || 'sale',
+      propertyType: p.property_type || 'apartment',
+      price: p.price || '0',
+      location: p.location || '',
+      status: p.status || 'available',
+      createdAt: p.created_at,
+    }));
   },
 
-  saveProperties(properties: PropertyRecord[]) {
-    writeDbFile('properties.json', properties);
+  async addProperty(property: Omit<PropertyRecord, 'id' | 'createdAt'> & { userEmail: string }) {
+    const { data, error } = await supabase
+      .from('properties')
+      .insert([
+        {
+          user_email: property.userEmail,
+          title: property.title,
+          listing_type: property.type || property.listingType || 'sale',
+          property_type: property.propertyType || 'apartment',
+          price: property.price,
+          location: property.location,
+        },
+      ])
+      .select()
+      .single();
+
+    if (error) {
+      console.error("[Supabase Insert Error]:", error);
+      throw error;
+    }
+    return data;
   },
 
-  addProperty(property: Omit<PropertyRecord, 'id' | 'createdAt'> & { userEmail: string }) {
-    const properties = readDbFile<PropertyRecord>('properties.json', []);
-    const newProperty: PropertyRecord = {
-      ...property,
-      id: 'prop_' + Date.now(),
-      createdAt: new Date().toISOString()
-    };
-    properties.push(newProperty);
-    this.saveProperties(properties);
-    return newProperty;
-  },
-
-  updateProperty(id: string, updates: Partial<PropertyRecord>): PropertyRecord | undefined {
-    const properties = readDbFile<PropertyRecord>('properties.json', []);
-    const idx = properties.findIndex(p => p.id === id);
-    if (idx === -1) return undefined;
-
-    properties[idx] = { ...properties[idx], ...updates };
-    this.saveProperties(properties);
-    return properties[idx];
-  },
-
-  deleteProperty(id: string): boolean {
-    const properties = readDbFile<PropertyRecord>('properties.json', []);
-    const filtered = properties.filter(p => p.id !== id);
-    if (filtered.length === properties.length) return false;
-    this.saveProperties(filtered);
-    return true;
+  async deleteProperty(id: string): Promise<boolean> {
+    const { error } = await supabase.from('properties').delete().eq('id', id);
+    return !error;
   },
 
   // --- LEADS ---
-  getLeads(email?: string): LeadRecord[] {
-    const leads = readDbFile<LeadRecord>('leads.json', []);
-    if (!email) return leads;
-    return leads.filter(l => l.userEmail?.toLowerCase() === email.toLowerCase());
+  async getLeads(email?: string): Promise<LeadRecord[]> {
+    let query = supabase.from('leads').select('*');
+    if (email) {
+      query = query.eq('user_email', email.toLowerCase());
+    }
+    const { data } = await query;
+    return data || [];
   },
 
-  saveLeads(leads: LeadRecord[]) {
-    writeDbFile('leads.json', leads);
-  },
-
-  addLead(lead: Omit<LeadRecord, 'id' | 'createdAt'> & { userEmail: string }) {
-    const leads = readDbFile<LeadRecord>('leads.json', []);
-    const newLead: LeadRecord = {
-      ...lead,
-      id: 'lead_' + Date.now(),
-      createdAt: new Date().toISOString()
-    };
-    leads.push(newLead);
-    this.saveLeads(leads);
-    return newLead;
+  async addLead(lead: Omit<LeadRecord, 'id' | 'createdAt'> & { userEmail: string }) {
+    const { data } = await supabase.from('leads').insert([{
+      user_email: lead.userEmail,
+      name: lead.name,
+      phone: lead.phone,
+      source: lead.source,
+      status: lead.status
+    }]).select().single();
+    return data;
   }
 };
