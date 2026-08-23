@@ -4,11 +4,11 @@ import { TrendingUp, UserCheck, UserPlus, Users } from "lucide-react";
 
 interface LeadsStatsProps {
   dict: Dictionary;
-  stats: {
-    totalLeads: number;
-    qualifiedLeads: number;
-    pendingLeads: number;
-    conversionRate: number;
+  stats?: {
+    totalLeads?: number;
+    qualifiedLeads?: number;
+    pendingLeads?: number;
+    conversionRate?: number;
   };
 }
 
@@ -20,11 +20,18 @@ const statConfig = [
 ];
 
 export function LeadsStats({ dict, stats }: LeadsStatsProps) {
-  const values: Record<string, string | number> = {
-    totalLeads: stats.totalLeads.toLocaleString(),
-    qualifiedLeads: stats.qualifiedLeads.toLocaleString(),
-    pendingLeads: stats.pendingLeads.toLocaleString(),
-    conversionRate: `${stats.conversionRate}%`,
+  const safeStats = {
+    totalLeads: stats?.totalLeads ?? 0,
+    qualifiedLeads: stats?.qualifiedLeads ?? 0,
+    pendingLeads: stats?.pendingLeads ?? 0,
+    conversionRate: stats?.conversionRate ?? 0,
+  };
+
+  const values: Record<string, string> = {
+    totalLeads: safeStats.totalLeads.toLocaleString(),
+    qualifiedLeads: safeStats.qualifiedLeads.toLocaleString(),
+    pendingLeads: safeStats.pendingLeads.toLocaleString(),
+    conversionRate: `${safeStats.conversionRate}%`,
   };
 
   return (
@@ -34,7 +41,7 @@ export function LeadsStats({ dict, stats }: LeadsStatsProps) {
           <CardHeader className="flex flex-row items-center justify-between mb-0">
             <div>
               <p className="text-sm font-medium text-surface-500">
-                {dict.dashboard.stats[key]}
+                {dict?.dashboard?.stats?.[key] || key}
               </p>
               <CardTitle className="mt-1 text-2xl">{values[key]}</CardTitle>
             </div>
