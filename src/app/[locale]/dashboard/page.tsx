@@ -22,9 +22,9 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
   const session = await getServerSession(authOptions);
   const userEmail = session?.user?.email || "";
 
-  // 2. جلب البيانات الحقيقية من قاعدة البيانات مع ضمان مصفوفات فارغة كحد أدنى
-  const rawLeads = userEmail ? jsonDb.getLeads(userEmail) || [] : [];
-  const rawProperties = userEmail ? jsonDb.getProperties(userEmail) || [] : [];
+  // 2. جلب البيانات الحقيقية من قاعدة البيانات باستخدام await لأن الدوال أصبحت async
+  const rawLeads = userEmail ? (await jsonDb.getLeads(userEmail)) || [] : [];
+  const rawProperties = userEmail ? (await jsonDb.getProperties(userEmail)) || [] : [];
 
   // 3. تأمين وتجهيز التواريخ لمنع خطأ toLocaleString
   const userLeads = rawLeads.map((lead: any) => ({
