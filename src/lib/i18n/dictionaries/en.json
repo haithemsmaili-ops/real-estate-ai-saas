@@ -86,7 +86,9 @@
         "monthlyPrice": "$399/mo",
         "cta": "Apply For Plan",
         "guarantee": "🛡️ 14-Day Performance Guarantee: If your response speed doesn't increase by 3x in 14 days, get a full refund on your retainer.",
-        "bonuses": [],
+        "bonuses": [
+          "🎁 FREE BONUS: Quarterly AI Performance & System Health Audit (Every 3 Months)"
+        ],
         "valueStack": [
           "Voice support (Arabic dialects & English)",
           "3 phone numbers + 1 channel (WhatsApp/Telegram/Email)",
@@ -105,7 +107,8 @@
         "cta": "Request Demo",
         "guarantee": "🛡️ 30-Day Closed-Deal Guarantee: Full refund if you don't generate qualified deal opportunities within 30 days.",
         "bonuses": [
-          "🎁 FREE BONUS: Complete Agency CRM Integration & WhatsApp Template Setup (Valued at $450)"
+          "🎁 FREE BONUS: Complete Agency CRM Integration & WhatsApp Template Setup (Valued at $450)",
+          "🎁 FREE BONUS: Monthly AI Performance & Strategy Optimization Audit"
         ],
         "valueStack": [
           "Full rich media (Video, Voice, Images, Floor Plan PDFs)",
@@ -126,7 +129,8 @@
         "guarantee": "🛡️ 60-Day Ironclad ROI Guarantee & Dedicated SLAs: We customize until you hit target ROI or you pay zero retainer fees.",
         "bonuses": [
           "🎁 FREE BONUS: Custom Voice AI Agent Training & Prompt Fine-Tuning (Valued at $1,200)",
-          "🎁 FREE BONUS: 1-on-1 VIP Team Onboarding & Workflow Strategy Sessions"
+          "🎁 FREE BONUS: 1-on-1 VIP Team Onboarding & Workflow Strategy Sessions",
+          "🎁 FREE BONUS: On-Demand AI Performance Audits & Workflow Optimization (Anytime Upon Request)"
         ],
         "valueStack": [
           "Enterprise Digital Assistant for high query volume",
