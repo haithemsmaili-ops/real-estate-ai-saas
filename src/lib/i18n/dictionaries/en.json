@@ -92,7 +92,7 @@
         "valueStack": [
           "Voice support (Arabic dialects & English)",
           "3 phone numbers + 1 channel (WhatsApp/Telegram/Email)",
-          "Up to 75 concurrent listings",
+          "Up to 25 active listings/mo",
           "Up to 2,000 conversations/mo",
           "Intent analytics & automated booking"
         ]
@@ -112,7 +112,7 @@
         ],
         "valueStack": [
           "Full rich media (Video, Voice, Images, Floor Plan PDFs)",
-          "Unlimited phone numbers & listings",
+          "Up to 50 active listings/mo",
           "3 simultaneous channels",
           "Up to 6,000 conversations/mo",
           "Direct integration with major CRMs"
@@ -134,9 +134,9 @@
         ],
         "valueStack": [
           "Enterprise Digital Assistant for high query volume",
+          "Unlimited active listings",
           "All Premium features included",
           "Custom Database & Voice Call API integrations",
-          "Unlimited conversations & channels",
           "24/7 dedicated account manager support"
         ]
       }
