@@ -1,25 +1,25 @@
 {
   "nav": {
-    "features": "Exceptional Features",
-    "pricing": "Investment Plans",
-    "dashboard": "Smart Dashboard",
-    "requestDemo": "Claim Your Copy"
+    "features": "Platform Features",
+    "pricing": "Sales Showcase & Pricing",
+    "dashboard": "Demo Dashboard",
+    "requestDemo": "Request Demo"
   },
   "hero": {
-    "badge": "🔥 Special Offer for the First 20 Real Estate Agencies Only",
-    "title": "Double Your Real Estate Deals in 30 Days... Or Your Money Back!",
-    "subtitle": "An all-in-one AI system that replaces 3 marketers and sales reps: replies to clients on WhatsApp in under a second, qualifies them by budget, and books viewings 24/7.",
-    "ctaPrimary": "Claim Launch Pricing Now",
-    "ctaSecondary": "See How It Works",
+    "badge": "✨ B2B Real Estate AI Showcase Platform",
+    "title": "Empower Your Real Estate Agency with Next-Gen AI Automation",
+    "subtitle": "An enterprise-grade AI system that qualifies buyers by budget, responds instantly on WhatsApp, voice, and omnichannel 24/7, and schedules viewing presentations seamlessly.",
+    "ctaPrimary": "Request Live Demo",
+    "ctaSecondary": "Explore Showcase",
     "stats": {
-      "agencies": "3x Faster Response Rate",
-      "leads": "Zero Lost Leads",
-      "markets": "ROI Within One Week"
+      "agencies": "3x Faster Lead Response",
+      "leads": "100% Qualified Inquiries",
+      "markets": "Instant ROI Demonstration"
     }
   },
   "features": {
-    "title": "Why You Will Crush Your Competitors With Our System",
-    "subtitle": "We don’t just sell you software; we deploy a non-stop sales machine working 24/7 for your agency.",
+    "title": "Why Real Estate Agencies Choose Our System",
+    "subtitle": "We don’t just sell software; we deploy a non-stop AI sales machine working 24/7 for your agency.",
     "leadQualifier": {
       "title": "AI Lead Qualifier",
       "description": "Filters out lookie-loos from real buyers, asking about budgets, preferred locations, and timelines with pinpoint accuracy."
@@ -46,82 +46,93 @@
     }
   },
   "pricing": {
-    "title": "Choose Your Agency's Growth Plan",
-    "subtitle": "A tiny investment that pays for itself many times over with a single closed deal.",
-    "marketValue": {
-      "starter": "250,000 DZD",
-      "growth": "400,000 DZD"
-    },
-    "setupLabel": "One-time setup fee",
-    "monthlyLabel": "Monthly retainer",
+    "title": "Select Your Agency's AI Growth Plan",
+    "subtitle": "Flexible B2B pricing packages tailored for high-performing real estate agencies and property developers.",
+    "setupLabel": "Setup Fee",
+    "monthlyLabel": "Monthly Retainer",
+    "modalTitle": "Selected Plan Breakdown",
+    "modalSubtitle": "Enterprise AI Capabilities & Feature Stack",
+    "infoMessage": "Plan selected! Our technical team will onboard your agency and configure your custom AI system within 3 business days following your demo agreement.",
+    "confirmButton": "Confirm Selection",
+    "closeModal": "Close Preview",
     "plans": {
-      "starter": {
-        "name": "Fast-Track Starter",
-        "setupPrice": "9,000 DZD",
-        "monthlyPrice": "5,000 DZD",
-        "period": "monthly",
-        "badge": "Most Popular for New Offices",
+      "basic": {
+        "name": "1. Basic Agent",
+        "badge": null,
+        "setupPrice": "$399",
+        "monthlyPrice": "$189/mo",
+        "cta": "Select This Plan",
         "valueStack": [
-          "AI Auto-Reply Assistant (WhatsApp & Web)",
-          "Automatic qualification of 500 leads/mo",
-          "Instant Google Sheets & N8N automation",
-          "Direct email technical support"
-        ],
-        "cta": "Start Now"
+          "WhatsApp text responses (1 channel)",
+          "Manage up to 10 active listings/mo",
+          "Up to 500 conversations/mo",
+          "Appointment scheduling & lead tracking",
+          "Single phone number support"
+        ]
       },
       "growth": {
-        "name": "Scale & Dominate",
-        "setupPrice": "12,000 DZD",
-        "monthlyPrice": "6,000 DZD",
-        "period": "monthly",
-        "badge": "Highest Value & ROI",
+        "name": "2. Growth Agent",
+        "badge": "Most Popular 🚀",
+        "setupPrice": "$699",
+        "monthlyPrice": "$499/mo",
+        "cta": "Apply For Plan",
         "valueStack": [
-          "All Starter Plan features",
-          "Unlimited leads and client conversations",
-          "Custom RAG Bot for your full property catalog",
-          "Omnichannel integration (WhatsApp + Email + SMS)",
-          "AI Lead Scoring & Qualification",
-          "Dedicated account manager & free setup",
-          "15-day money-back guarantee"
-        ],
-        "cta": "Dominate Your Market"
+          "Voice support (Arabic dialects & English)",
+          "3 phone numbers + 1 channel (WhatsApp/Telegram/Email)",
+          "Up to 75 concurrent listings",
+          "Up to 2,000 conversations/mo",
+          "Intent analytics & automated booking"
+        ]
+      },
+      "premium": {
+        "name": "3. Premium Omnichannel",
+        "badge": null,
+        "setupPrice": "$1,299",
+        "monthlyPrice": "$999/mo",
+        "cta": "Request Demo",
+        "valueStack": [
+          "Full rich media (Video, Voice, Images, Floor Plan PDFs)",
+          "Unlimited phone numbers & listings",
+          "3 simultaneous channels",
+          "Up to 6,000 conversations/mo",
+          "Direct integration with major CRMs"
+        ]
       },
       "enterprise": {
-        "name": "Elite Agency (VIP)",
-        "setupPrice": "Custom",
-        "monthlyPrice": "Custom",
-        "period": "monthly",
-        "badge": "Tailored for Top Brokers",
+        "name": "4. Developer Enterprise",
+        "badge": null,
+        "setupPrice": "$1,999",
+        "monthlyPrice": "From $1,699/mo",
+        "cta": "Schedule Onboarding",
         "valueStack": [
-          "All Growth Plan features",
-          "Fully customized AI trained on your brand tone",
-          "Advanced N8N & custom CRM workflows",
-          "Free sales team onboarding and training",
-          "30-day money-back guarantee"
-        ],
-        "cta": "Join Elite Agencies"
+          "Enterprise Digital Assistant for high query volume",
+          "All Premium features included",
+          "Custom Database & Voice Call API integrations",
+          "Unlimited conversations & channels",
+          "24/7 dedicated account manager support"
+        ]
       }
     }
   },
   "cta": {
-    "title": "Ready to Multiply Your Agency's Profits?",
-    "subtitle": "Don't let competitors beat you to AI adoption. Claim your spot before launch pricing slots fill up.",
-    "button": "Book Instant Demo",
-    "placeholder": "Enter your official work email",
-    "success": "Awesome! Your spot is secured, we will contact you within 2 hours to deploy."
+    "title": "Ready to Transform Your Agency's Sales Workflow?",
+    "subtitle": "Schedule a presentation session to customize an AI solution built specifically for your property listings.",
+    "button": "Request Presentation Demo",
+    "placeholder": "Enter your work email",
+    "success": "Thank you! Your demo request has been received. Our sales presentation team will contact you shortly."
   },
   "footer": {
-    "brandDescription": "The first AI platform for real estate agencies in Algeria enabling instant response and client qualification.",
+    "brandDescription": "The ultimate AI sales & presentation platform for real estate agencies globally enabling instant response and client qualification.",
     "product": "Product",
     "company": "Company",
     "legal": "Legal",
-    "about": "About",
-    "contact": "Contact",
+    "about": "About Us",
+    "contact": "Contact Us",
     "privacy": "Privacy Policy",
     "terms": "Terms of Service",
     "rights": "All rights reserved.",
     "aboutModalTitle": "About PropAI",
-    "aboutModalText": "PropAI is an advanced AI platform for real estate agencies in Algeria. It enables automated instant responses on WhatsApp, 24/7 lead qualification, and appointment booking without errors.",
+    "aboutModalText": "PropAI is a global AI presentation platform empowering real estate agencies to qualify leads, book viewings, and showcase properties 24/7.",
     "contactModalTitle": "Contact Us"
   },
   "chat": {
@@ -131,8 +142,8 @@
     "placeholder": "Ask your real estate question..."
   },
   "seo": {
-    "title": "PropAI – AI‑Powered Real Estate Platform",
-    "description": "Modular AI SaaS for real‑estate agencies – qualify leads, automate omnichannel communication, and answer property questions with zero hallucinations.",
+    "title": "PropAI – B2B Sales Showcase & Demo Platform",
+    "description": "Enterprise AI SaaS for real estate agencies – qualify leads, showcase AI features, and present omnichannel property bots.",
     "ogImage": "/og-image.jpg"
   },
   "dashboard": {

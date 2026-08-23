@@ -7,9 +7,6 @@ import { PricingSection } from "@/components/landing/PricingSection";
 import { RequestDemoCTA } from "@/components/landing/RequestDemoCTA";
 import Footer from "@/components/landing/Footer";
 import { ClientLandingWrapper } from "@/components/landing/ClientLandingWrapper";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { jsonDb } from "@/lib/db/json-db";
 
 interface HomePageProps {
   params: Promise<{ locale: string }>;
@@ -17,31 +14,17 @@ interface HomePageProps {
 
 export default async function HomePage({ params }: HomePageProps) {
   const { locale: localeParam } = await params;
-  const locale = isValidLocale(localeParam) ? localeParam : "en";
+  const locale = isValidLocale(localeParam) ? localeParam : "ar";
   const dict = await getDictionary(locale);
-
-  // Check if user has paid and 24 hours have elapsed
-  const session = await getServerSession(authOptions);
-  let showPricing = true;
-  if (session?.user?.email) {
-    const user = jsonDb.getUserByEmail(session.user.email);
-    if (user && user.hasPaid && user.paymentTimestamp) {
-      const elapsed = Date.now() - user.paymentTimestamp;
-      const hours = elapsed / (1000 * 60 * 60);
-      if (hours >= 24 || (user as any).adminActivated) {
-        showPricing = false;
-      }
-    }
-  }
 
   return (
     <ClientLandingWrapper>
-      <Navbar dict={dict} locale={locale} showPricing={showPricing} />
+      <Navbar dict={dict} locale={locale} showPricing={true} />
       <main className="flex-1">
         <Hero dict={dict} locale={locale} />
         <FeaturesGrid dict={dict} />
-        {/* قسم الأسعار الأسطوري - يُعرض فقط إذا لم يكتمل التفعيل بعد 24 ساعة */}
-        {showPricing && <PricingSection dict={dict} locale={locale} />}
+        {/* Showcase & Demo Platform Pricing Section */}
+        <PricingSection dict={dict} locale={locale} />
         <RequestDemoCTA dict={dict} />
       </main>
       <Footer dict={dict} />

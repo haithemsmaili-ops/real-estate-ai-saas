@@ -18,7 +18,7 @@ export default function Footer({ dict }: { dict?: any }) {
           <div className="space-y-4">
             <h3 className="text-xl font-bold text-surface-900 dark:text-white">PropAI</h3>
             <p className="text-sm text-surface-600 dark:text-surface-400">
-              {f.brandDescription || "The first AI platform for real estate agencies in Algeria."}
+              {f.brandDescription || "The Ultimate AI Sales & Automation Platform for Real Estate Agencies Worldwide."}
             </p>
           </div>
 
@@ -90,7 +90,7 @@ export default function Footer({ dict }: { dict?: any }) {
               {f.aboutModalTitle || "About PropAI"}
             </h3>
             <p className="text-surface-600 dark:text-surface-300 leading-relaxed text-sm">
-              {f.aboutModalText || "PropAI is an advanced AI platform for real estate agencies in Algeria."}
+              {f.aboutModalText || "PropAI is an advanced AI sales and automation platform empowering real estate agencies worldwide to convert leads, schedule viewings, and close deals 24/7."}
             </p>
           </div>
         </div>
@@ -110,9 +110,9 @@ export default function Footer({ dict }: { dict?: any }) {
               {f.contactModalTitle || "Contact Us"}
             </h3>
             <div className="space-y-3 text-sm text-surface-600 dark:text-surface-300">
-              <p>📧 <strong>Email:</strong> contact@propai.com</p>
-              <p>📸 <strong>Instagram:</strong> @propai.dz</p>
-              <p>💼 <strong>LinkedIn:</strong> PropAI Algeria</p>
+              <p>📧 <strong>Email:</strong> contact@propai.co</p>
+              <p>💼 <strong>LinkedIn:</strong> PropAI Global</p>
+              <p>🌐 <strong>Website:</strong> www.propai.co</p>
             </div>
           </div>
         </div>
