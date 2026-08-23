@@ -47,21 +47,28 @@
   },
   "pricing": {
     "title": "Select Your Agency's AI Growth Plan",
-    "subtitle": "Flexible B2B pricing packages tailored for high-performing real estate agencies and property developers.",
+    "subtitle": "Flexible B2B pricing packages with anchor discounts, performance guarantees, and exclusive presentation bonuses.",
     "setupLabel": "Setup Fee",
     "monthlyLabel": "Monthly Retainer",
+    "originalSetupLabel": "Original Setup",
+    "originalMonthlyLabel": "Original Retainer",
     "modalTitle": "Selected Plan Breakdown",
-    "modalSubtitle": "Enterprise AI Capabilities & Feature Stack",
+    "modalSubtitle": "Enterprise AI Capabilities, Guarantees & Bonus Stack",
     "infoMessage": "Plan selected! Our technical team will onboard your agency and configure your custom AI system within 3 business days following your demo agreement.",
     "confirmButton": "Confirm Selection",
     "closeModal": "Close Preview",
+    "saveBadge": "Save ~30% Launch Discount",
     "plans": {
       "basic": {
         "name": "1. Basic Agent",
         "badge": null,
+        "anchorSetup": "$520",
+        "anchorMonthly": "$249/mo",
         "setupPrice": "$399",
         "monthlyPrice": "$189/mo",
         "cta": "Select This Plan",
+        "guarantee": null,
+        "bonuses": [],
         "valueStack": [
           "WhatsApp text responses (1 channel)",
           "Manage up to 10 active listings/mo",
@@ -73,9 +80,13 @@
       "growth": {
         "name": "2. Growth Agent",
         "badge": "Most Popular 🚀",
+        "anchorSetup": "$910",
+        "anchorMonthly": "$649/mo",
         "setupPrice": "$699",
         "monthlyPrice": "$499/mo",
         "cta": "Apply For Plan",
+        "guarantee": "🛡️ 14-Day Performance Guarantee: If your response speed doesn't increase by 3x in 14 days, get a full refund on your retainer.",
+        "bonuses": [],
         "valueStack": [
           "Voice support (Arabic dialects & English)",
           "3 phone numbers + 1 channel (WhatsApp/Telegram/Email)",
@@ -86,10 +97,16 @@
       },
       "premium": {
         "name": "3. Premium Omnichannel",
-        "badge": null,
+        "badge": "High ROI Choice 🔥",
+        "anchorSetup": "$1,690",
+        "anchorMonthly": "$1,299/mo",
         "setupPrice": "$1,299",
         "monthlyPrice": "$999/mo",
         "cta": "Request Demo",
+        "guarantee": "🛡️ 30-Day Closed-Deal Guarantee: Full refund if you don't generate qualified deal opportunities within 30 days.",
+        "bonuses": [
+          "🎁 FREE BONUS: Complete Agency CRM Integration & WhatsApp Template Setup (Valued at $450)"
+        ],
         "valueStack": [
           "Full rich media (Video, Voice, Images, Floor Plan PDFs)",
           "Unlimited phone numbers & listings",
@@ -100,10 +117,17 @@
       },
       "enterprise": {
         "name": "4. Developer Enterprise",
-        "badge": null,
+        "badge": "Custom SLA & VIP 👑",
+        "anchorSetup": "$2,590",
+        "anchorMonthly": "From $2,199/mo",
         "setupPrice": "$1,999",
         "monthlyPrice": "From $1,699/mo",
         "cta": "Schedule Onboarding",
+        "guarantee": "🛡️ 60-Day Ironclad ROI Guarantee & Dedicated SLAs: We customize until you hit target ROI or you pay zero retainer fees.",
+        "bonuses": [
+          "🎁 FREE BONUS: Custom Voice AI Agent Training & Prompt Fine-Tuning (Valued at $1,200)",
+          "🎁 FREE BONUS: 1-on-1 VIP Team Onboarding & Workflow Strategy Sessions"
+        ],
         "valueStack": [
           "Enterprise Digital Assistant for high query volume",
           "All Premium features included",
