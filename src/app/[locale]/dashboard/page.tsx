@@ -18,36 +18,50 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
   const locale = isValidLocale(localeParam) ? localeParam : "en";
   const dict = await getDictionary(locale);
 
-  // 1. الحصول على جلسة المستخدم الحالية
+  // 1. الحصول على جلسة المستخدم الحالية بأمان
   const session = await getServerSession(authOptions);
   const userEmail = session?.user?.email || "";
 
-  // 2. جلب البيانات الحقيقية من قاعدة البيانات
-  const userLeads = jsonDb.getLeads(userEmail);
-  const userProperties = jsonDb.getProperties(userEmail);
+  // 2. جلب البيانات الحقيقية من قاعدة البيانات مع ضمان مصفوفات فارغة كحد أدنى
+  const rawLeads = userEmail ? jsonDb.getLeads(userEmail) || [] : [];
+  const rawProperties = userEmail ? jsonDb.getProperties(userEmail) || [] : [];
 
-  // 3. حساب الإحصائيات الواقعية
+  // 3. تأمين وتجهيز التواريخ لمنع خطأ toLocaleString
+  const userLeads = rawLeads.map((lead: any) => ({
+    ...lead,
+    createdAt: lead.createdAt ? new Date(lead.createdAt).toISOString() : new Date().toISOString(),
+    updatedAt: lead.updatedAt ? new Date(lead.updatedAt).toISOString() : new Date().toISOString(),
+  }));
+
+  // 4. حساب الإحصائيات الواقعية مع الحماية
   const totalLeads = userLeads.length;
-  const totalProperties = userProperties.length;
+  const totalProperties = rawProperties.length;
   const qualifiedLeads = userLeads.filter(
-    (l) => l.status === "qualified" || l.status === "converted"
+    (l: any) => l.status === "qualified" || l.status === "converted"
   ).length;
   const conversionRate =
     totalLeads > 0 ? (qualifiedLeads / totalLeads) * 100 : 0;
 
-  // هيكلة الإحصائيات لنقلها لمكون LeadsStats
   const realStats = {
-    totalLeads,
-    totalProperties,
-    qualifiedLeads,
-    conversionRate: Math.round(conversionRate),
+    totalLeads: totalLeads || 0,
+    totalProperties: totalProperties || 0,
+    qualifiedLeads: qualifiedLeads || 0,
+    conversionRate: Math.round(conversionRate) || 0,
   };
 
-  // حالة القنوات
-  const channelStatuses = omnichannelService.getChannelStatuses().map((ch) => ({
-    channel: ch.channel,
-    connected: ch.connected,
-  }));
+  // 5. جلب حالة القنوات مع الحماية من القيم الفارغة
+  let channelStatuses: Array<{ channel: string; connected: boolean }> = [];
+  try {
+    const rawStatuses = omnichannelService.getChannelStatuses();
+    if (Array.isArray(rawStatuses)) {
+      channelStatuses = rawStatuses.map((ch) => ({
+        channel: ch.channel,
+        connected: Boolean(ch.connected),
+      }));
+    }
+  } catch (err) {
+    console.error("Error fetching channel statuses:", err);
+  }
 
   return (
     <div className="space-y-6">
@@ -57,7 +71,7 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
         <ChannelStatusCard
           dict={dict}
           channels={
-            channelStatuses.length ? channelStatuses : mockChannelStatuses
+            (channelStatuses.length ? channelStatuses : mockChannelStatuses) as any
           }
         />
         <RecentLeadsTable dict={dict} leads={userLeads as any} />
