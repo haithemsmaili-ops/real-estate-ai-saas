@@ -205,6 +205,78 @@
       "source": "Source",
       "score": "Score",
       "status": "Status"
+    },
+    "propertiesPage": {
+      "title": "Properties & Listings Management",
+      "subtitle": "Manage, organize, and showcase your agency's international real estate catalog for AI qualifications.",
+      "addProperty": "Add Property",
+      "searchPlaceholder": "Search properties by title, city, district...",
+      "filterAllStatus": "All Availability",
+      "filterAllTypes": "All Property Types",
+      "emptyTitle": "No Properties Listed Yet",
+      "emptySubtitle": "Start building your agency portfolio by adding your first real estate listing.",
+      "modalTitle": "Add New Property Listing",
+      "modalSubtitle": "Fill in the complete international specs to sync with your AI catalog bot.",
+      "form": {
+        "titleLabel": "Property Title",
+        "titlePlaceholder": "e.g. Luxury Oceanview Villa with Private Pool",
+        "descLabel": "Detailed Description",
+        "descPlaceholder": "Describe key property highlights, surrounding infrastructure, views, and key terms...",
+        "propertyType": "Property Type",
+        "listingType": "Listing Type",
+        "price": "Price Amount",
+        "currency": "Currency",
+        "country": "Country",
+        "city": "City / State",
+        "district": "District / Area",
+        "address": "Street Address (Optional)",
+        "area": "Size / Area",
+        "areaUnit": "Measurement Unit",
+        "bedrooms": "Bedrooms",
+        "bathrooms": "Bathrooms",
+        "parkingSpaces": "Parking Spaces",
+        "floorNumber": "Floor Number",
+        "legalStatus": "Legal Status",
+        "propertyStatus": "Availability Status",
+        "amenities": "Amenities & Features",
+        "cancel": "Cancel",
+        "submit": "Save & Publish Listing",
+        "saving": "Publishing..."
+      },
+      "types": {
+        "apartment": "Apartment",
+        "villa": "Villa",
+        "townhouse": "Townhouse",
+        "land": "Land",
+        "building": "Entire Building",
+        "commercial": "Commercial",
+        "office": "Office Space"
+      },
+      "listingTypes": {
+        "sale": "For Sale",
+        "rent": "For Rent",
+        "short_term": "Short-term / Daily"
+      },
+      "legalStatuses": {
+        "freehold": "Freehold / Registered Title",
+        "off_plan": "Off-Plan (Under Construction)",
+        "leasehold": "Leasehold",
+        "pending_verification": "Pending Verification"
+      },
+      "statuses": {
+        "available": "Available",
+        "pending": "Pending",
+        "sold": "Sold",
+        "rented": "Rented"
+      },
+      "amenities": {
+        "furnished": "Furnished",
+        "swimming_pool": "Swimming Pool",
+        "gym": "Gym / Fitness Center",
+        "security": "24/7 Security",
+        "garage": "Private Garage",
+        "balcony": "Balcony / Terrace"
+      }
     }
   }
 }

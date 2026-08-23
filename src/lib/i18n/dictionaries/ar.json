@@ -194,6 +194,78 @@
       "source": "المصدر",
       "score": "الدرجة",
       "status": "الحالة"
+    },
+    "propertiesPage": {
+      "title": "إدارة العقارات والكتالوج",
+      "subtitle": "إدارة وتنظيم العقارات المتاحة للوكالة وتأهيلها التلقائي للذكاء الاصطناعي.",
+      "addProperty": "إضافة عقار جديد",
+      "searchPlaceholder": "البحث بالعنوان، المدينة، أو المنطقة...",
+      "filterAllStatus": "جميع الحالات",
+      "filterAllTypes": "جميع أنواع العقارات",
+      "emptyTitle": "لا توجد عقارات مضافة بعد",
+      "emptySubtitle": "ابدأ في بناء محفظتك العقارية عن طريق إضافة أول عقار لوكالتك.",
+      "modalTitle": "إضافة عقار جديد للكتالوج",
+      "modalSubtitle": "أدخل التفاصيل والمواصفات بدقة لربطها بالبوت العقاري الذكي.",
+      "form": {
+        "titleLabel": "عنوان العقار",
+        "titlePlaceholder": "مثال: فيلا فاخرة بمسبح خاص وإطلالة بحرية",
+        "descLabel": "الوصف التفصيلي",
+        "descPlaceholder": "اكتب وصفاً شاملاً لمميزات العقار والإطلالة والمحيط...",
+        "propertyType": "نوع العقار",
+        "listingType": "نوع العرض",
+        "price": "المبلغ / السعر",
+        "currency": "العملة",
+        "country": "الدولة",
+        "city": "المدينة / الولاية",
+        "district": "المنطقة / الحي",
+        "address": "العنوان التفصيلي (اختياري)",
+        "area": "المساحة",
+        "areaUnit": "وحدة القياس",
+        "bedrooms": "غرف النوم",
+        "bathrooms": "دورات المياه",
+        "parkingSpaces": "مواقف السيارات",
+        "floorNumber": "رقم الطابق",
+        "legalStatus": "الوضع القانوني والملكية",
+        "propertyStatus": "حالة التوفر",
+        "amenities": "المميزات والمرافق",
+        "cancel": "إلغاء",
+        "submit": "حفظ ونشر العقار",
+        "saving": "جاري الحفظ..."
+      },
+      "types": {
+        "apartment": "شقة سكنية",
+        "villa": "فيلا",
+        "townhouse": "تاون هاوس",
+        "land": "أرض",
+        "building": "مبنى كامل",
+        "commercial": "محل / تجاري",
+        "office": "مكتب"
+      },
+      "listingTypes": {
+        "sale": "للبيع",
+        "rent": "للإيجار",
+        "short_term": "إيجار مؤقت / يومي"
+      },
+      "legalStatuses": {
+        "freehold": "ملكية حرّة / عقد موثق",
+        "off_plan": "قيد الإنشاء (Off-Plan)",
+        "leasehold": "حق انتفاع / إيجار طويل",
+        "pending_verification": "قيد التحقق التوثيقي"
+      },
+      "statuses": {
+        "available": "متاح",
+        "pending": "قيد المعاينة",
+        "sold": "تم البيع",
+        "rented": "تم الإيجار"
+      },
+      "amenities": {
+        "furnished": "مفروش بالكامل",
+        "swimming_pool": "مسبح خاص/مشترك",
+        "gym": "صالة رياضية (Gym)",
+        "security": "حراسة وأمن 24/7",
+        "garage": "كراج / موقف خاص",
+        "balcony": "شرفة / تراس"
+      }
     }
   },
   "chat": {

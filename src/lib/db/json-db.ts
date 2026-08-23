@@ -32,11 +32,29 @@ export interface PropertyRecord {
   id: string;
   userEmail: string; // ربط العقار ببريد المستخدم
   title: string;
-  type: 'sale' | 'rent';
+  description?: string;
+  type: 'sale' | 'rent' | 'short_term';
+  propertyType?: 'apartment' | 'villa' | 'townhouse' | 'land' | 'building' | 'commercial' | 'office';
+  listingType?: 'sale' | 'rent' | 'short_term';
   price: string;
+  numericPrice?: number;
+  currency?: 'USD' | 'EUR' | 'SAR' | 'AED' | 'QAR' | 'KWD' | 'EGP' | 'DZD';
   location: string;
-  status: 'available' | 'sold' | 'rented';
+  country?: string;
+  city?: string;
+  district?: string;
+  address?: string;
+  area?: number;
+  areaUnit?: 'sqm' | 'sqft';
+  bedrooms?: number;
+  bathrooms?: number;
+  parkingSpaces?: number;
+  floorNumber?: number;
+  legalStatus?: 'freehold' | 'off_plan' | 'leasehold' | 'pending_verification';
+  status: 'available' | 'pending' | 'sold' | 'rented';
+  amenities?: string[];
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface LeadRecord {
@@ -172,6 +190,14 @@ export const jsonDb = {
     properties[idx] = { ...properties[idx], ...updates };
     this.saveProperties(properties);
     return properties[idx];
+  },
+
+  deleteProperty(id: string): boolean {
+    const properties = readDbFile<PropertyRecord>('properties.json', []);
+    const filtered = properties.filter(p => p.id !== id);
+    if (filtered.length === properties.length) return false;
+    this.saveProperties(filtered);
+    return true;
   },
 
   // --- LEADS ---
