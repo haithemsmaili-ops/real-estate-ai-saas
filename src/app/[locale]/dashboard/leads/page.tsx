@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
+import { useParams } from "next/navigation";
 import {
   Search,
   Filter,
@@ -13,8 +14,9 @@ import {
   Trash2,
   Eye,
   X,
-  CheckCircle,
-  Clock,
+  Plus,
+  RefreshCw,
+  Users,
 } from "lucide-react";
 
 interface Lead {
@@ -25,76 +27,108 @@ interface Lead {
   budget: string;
   location: string;
   status: "Qualified" | "New" | "Contacted";
-  notes: string;
-  createdAt: string;
+  notes?: string;
+  createdAt?: string;
 }
 
-const INITIAL_LEADS: Lead[] = [
-  {
-    id: "1",
-    name: "أحمد بن علي",
-    phone: "+213 555 123 456",
-    propertyType: "شقة F3",
-    budget: "1.5 مليار سنتيم",
-    location: "زرالدة، الجزائر",
-    status: "Qualified",
-    notes: "يبحث عن شقة بدفتر عقاري، جاهز للشراء الفوري.",
-    createdAt: "2026-08-20",
-  },
-  {
-    id: "2",
-    name: "سارة محمود",
-    phone: "+213 661 987 654",
-    propertyType: "فيلا",
-    budget: "6.5 مليار سنتيم",
-    location: "معالمة، الجزائر",
-    status: "New",
-    notes: "تريد فيلا بمساحة لا تقل عن 300 م².",
-    createdAt: "2026-08-22",
-  },
-];
-
 export default function LeadsPage() {
-  const [lang, setLang] = useState<"ar" | "en">("ar");
-  const [leads, setLeads] = useState<Lead[]>(INITIAL_LEADS);
+  const params = useParams();
+  const locale = (params?.locale as string) || "ar";
+  const [lang, setLang] = useState<"ar" | "en">(locale === "ar" ? "ar" : "en");
+
+  // المصفوفة تبدأ فارغة تماماً بدون أي أسماء تجريبية
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
 
   const isAr = lang === "ar";
 
+  // جلب البيانات الحقيقية من الـ API
+  const fetchLeads = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/v1/leads");
+      if (res.ok) {
+        const data = await res.json();
+        const leadsData = Array.isArray(data) ? data : data.leads || [];
+        setLeads(leadsData);
+      }
+    } catch (err) {
+      console.error("Error fetching leads:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchLeads();
+  }, []);
+
   const filteredLeads = useMemo(() => {
     return leads.filter((lead) => {
+      const query = searchTerm.toLowerCase();
       const matchesSearch =
-        lead.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        lead.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        lead.propertyType.toLowerCase().includes(searchTerm.toLowerCase());
+        lead.name?.toLowerCase().includes(query) ||
+        lead.location?.toLowerCase().includes(query) ||
+        lead.propertyType?.toLowerCase().includes(query) ||
+        lead.phone?.toLowerCase().includes(query);
+
       const matchesStatus =
         statusFilter === "ALL" || lead.status === statusFilter;
       return matchesSearch && matchesStatus;
     });
   }, [leads, searchTerm, statusFilter]);
 
-  const toggleStatus = (id: string) => {
+  const toggleStatus = async (id: string) => {
+    const currentLead = leads.find((l) => l.id === id);
+    if (!currentLead) return;
+
+    const nextStatus =
+      currentLead.status === "New"
+        ? "Contacted"
+        : currentLead.status === "Contacted"
+          ? "Qualified"
+          : "New";
+
+    // تحديث واجهة المستخدم فوراً
     setLeads((prev) =>
-      prev.map((lead) => {
-        if (lead.id === id) {
-          const nextStatus =
-            lead.status === "New"
-              ? "Contacted"
-              : lead.status === "Contacted"
-                ? "Qualified"
-                : "New";
-          return { ...lead, status: nextStatus };
-        }
-        return lead;
-      })
+      prev.map((lead) =>
+        lead.id === id ? { ...lead, status: nextStatus } : lead
+      )
     );
+
+    // إرسال التحديث للسيرفر
+    try {
+      await fetch(`/api/v1/leads/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: nextStatus }),
+      });
+    } catch (err) {
+      console.error("Error updating lead status:", err);
+    }
   };
 
-  const deleteLead = (id: string) => {
+  const deleteLead = async (id: string) => {
+    if (
+      !confirm(
+        isAr
+          ? "هل أنت متأكد من حذف هذا العميل؟"
+          : "Are you sure you want to delete this lead?"
+      )
+    )
+      return;
+
     setLeads((prev) => prev.filter((lead) => lead.id !== id));
     if (selectedLead?.id === id) setSelectedLead(null);
+
+    try {
+      await fetch(`/api/v1/leads/${id}`, { method: "DELETE" });
+    } catch (err) {
+      console.error("Error deleting lead:", err);
+    }
   };
 
   return (
@@ -115,12 +149,21 @@ export default function LeadsPage() {
           </p>
         </div>
 
-        <button
-          onClick={() => setLang(isAr ? "en" : "ar")}
-          className="self-start md:self-auto px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium hover:bg-slate-100 transition"
-        >
-          {isAr ? "English 🌐" : "العربية 🌐"}
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={fetchLeads}
+            className="p-2 bg-white border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-100 transition"
+            title={isAr ? "تحديث" : "Refresh"}
+          >
+            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+          </button>
+          <button
+            onClick={() => setLang(isAr ? "en" : "ar")}
+            className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium hover:bg-slate-100 transition"
+          >
+            {isAr ? "English 🌐" : "العربية 🌐"}
+          </button>
+        </div>
       </div>
 
       {/* Filters & Search Bar */}
@@ -134,7 +177,7 @@ export default function LeadsPage() {
             }
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-10 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full pl-10 pr-10 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
           />
         </div>
 
@@ -143,7 +186,7 @@ export default function LeadsPage() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
           >
             <option value="ALL">{isAr ? "كل الحالات" : "All Statuses"}</option>
             <option value="New">{isAr ? "جديد" : "New"}</option>
@@ -153,55 +196,84 @@ export default function LeadsPage() {
         </div>
       </div>
 
-      {/* Leads Grid */}
-      {filteredLeads.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-xl border border-slate-200 text-slate-500">
-          {isAr ? "لا يوجد عملاء مطابقون للبحث." : "No matching leads found."}
+      {/* Content State */}
+      {loading ? (
+        <div className="text-center py-16 bg-white rounded-xl border border-slate-200 text-slate-500">
+          <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-3 text-emerald-600" />
+          <p>{isAr ? "جاري تحميل العملاء..." : "Loading leads..."}</p>
+        </div>
+      ) : filteredLeads.length === 0 ? (
+        <div className="text-center py-16 bg-white rounded-xl border border-slate-200 text-slate-400">
+          <Users className="w-12 h-12 mx-auto mb-3 text-slate-300" />
+          <p className="font-medium text-slate-600">
+            {isAr ? "لا يوجد عملاء حالياً." : "No leads found."}
+          </p>
+          <p className="text-xs text-slate-400 mt-1">
+            {isAr
+              ? "سيظهر العملاء الجدد هنا فور تواصلهم عبر الشات بوت أو الواتساب."
+              : "New leads will appear here automatically."}
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredLeads.map((lead) => (
             <div
               key={lead.id}
-              className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition relative group"
+              className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition relative group flex flex-col justify-between"
             >
-              <div className="flex justify-between items-start mb-3">
-                <div>
-                  <h3 className="font-semibold text-slate-900 text-lg">
-                    {lead.name}
-                  </h3>
-                  <span className="text-xs text-slate-400">{lead.createdAt}</span>
-                </div>
-                <span
-                  className={`text-xs px-2.5 py-1 rounded-full font-medium ${lead.status === "Qualified"
-                      ? "bg-emerald-100 text-emerald-700"
-                      : lead.status === "Contacted"
-                        ? "bg-blue-100 text-blue-700"
-                        : "bg-amber-100 text-amber-700"
-                    }`}
-                >
-                  {lead.status}
-                </span>
-              </div>
-
-              <div className="space-y-2 text-sm text-slate-600 mb-4">
-                <div className="flex items-center gap-2">
-                  <Building className="w-4 h-4 text-slate-400" />
-                  <span>{lead.propertyType}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-slate-400" />
-                  <span>{lead.location}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <DollarSign className="w-4 h-4 text-slate-400" />
-                  <span className="font-medium text-slate-800">
-                    {lead.budget}
+              <div>
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <h3 className="font-semibold text-slate-900 text-lg">
+                      {lead.name}
+                    </h3>
+                    <span className="text-xs text-slate-400">
+                      {lead.createdAt || new Date().toLocaleDateString()}
+                    </span>
+                  </div>
+                  <span
+                    className={`text-xs px-2.5 py-1 rounded-full font-medium ${lead.status === "Qualified"
+                        ? "bg-emerald-100 text-emerald-700"
+                        : lead.status === "Contacted"
+                          ? "bg-blue-100 text-blue-700"
+                          : "bg-amber-100 text-amber-700"
+                      }`}
+                  >
+                    {lead.status}
                   </span>
+                </div>
+
+                <div className="space-y-2 text-sm text-slate-600 mb-4">
+                  <div className="flex items-center gap-2">
+                    <Building className="w-4 h-4 text-slate-400 shrink-0" />
+                    <span>{lead.propertyType || (isAr ? "غير محدد" : "N/A")}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-slate-400 shrink-0" />
+                    <span>{lead.location || (isAr ? "غير محدد" : "N/A")}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="w-4 h-4 text-slate-400 shrink-0" />
+                    <span className="font-medium text-slate-800">
+                      {lead.budget || (isAr ? "غير محدد" : "N/A")}
+                    </span>
+                  </div>
                 </div>
               </div>
 
               <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                {lead.phone && (
+                  <a
+                    href={`https://wa.me/${lead.phone.replace(/[^0-9]/g, "")}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition"
+                  >
+                    <MessageSquare className="w-3.5 h-3.5" />
+                    <span>{isAr ? "واتساب" : "WhatsApp"}</span>
+                  </a>
+                )}
+
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => setSelectedLead(lead)}
@@ -219,82 +291,74 @@ export default function LeadsPage() {
                   </button>
                   <button
                     onClick={() => deleteLead(lead.id)}
-                    className="p-2 hover:bg-red-50 rounded-lg text-red-600 transition"
+                    className="p-2 hover:bg-red-50 rounded-lg text-red-500 transition"
                     title={isAr ? "حذف" : "Delete"}
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
-
-                <a
-                  href={`https://wa.me/${lead.phone.replace(/[^0-9]/g, "")}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-medium transition"
-                >
-                  <MessageSquare className="w-3.5 h-3.5" />
-                  <span>{isAr ? "واتساب" : "WhatsApp"}</span>
-                </a>
               </div>
             </div>
           ))}
         </div>
       )}
 
-      {/* Lead Details Modal */}
+      {/* Modal تفاصيل العميل */}
       {selectedLead && (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-lg rounded-2xl p-6 shadow-xl relative animate-in fade-in zoom-in-95">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200 space-y-4 relative">
             <button
               onClick={() => setSelectedLead(null)}
-              className="absolute top-4 left-4 rtl:right-4 rtl:left-auto text-slate-400 hover:text-slate-600"
+              className="absolute top-4 left-4 p-1.5 text-slate-400 hover:text-slate-700 rounded-full hover:bg-slate-100 transition"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <h2 className="text-xl font-bold text-slate-900 mb-1">
+            <h3 className="text-xl font-bold text-slate-900 border-b pb-3">
               {selectedLead.name}
-            </h2>
-            <p className="text-xs text-slate-400 mb-6">
-              {isAr ? "معرف العميل:" : "Lead ID:"} {selectedLead.id}
-            </p>
+            </h3>
 
-            <div className="space-y-4 text-sm">
-              <div className="bg-slate-50 p-3 rounded-lg flex items-center justify-between">
-                <span className="text-slate-500">{isAr ? "رقم الهاتف:" : "Phone:"}</span>
-                <span className="font-semibold text-slate-800">{selectedLead.phone}</span>
-              </div>
-              <div className="bg-slate-50 p-3 rounded-lg flex items-center justify-between">
-                <span className="text-slate-500">{isAr ? "نوع العقار:" : "Property:"}</span>
-                <span className="font-semibold text-slate-800">{selectedLead.propertyType}</span>
-              </div>
-              <div className="bg-slate-50 p-3 rounded-lg flex items-center justify-between">
-                <span className="text-slate-500">{isAr ? "الميزانية:" : "Budget:"}</span>
-                <span className="font-semibold text-slate-800">{selectedLead.budget}</span>
-              </div>
-              <div className="bg-slate-50 p-3 rounded-lg flex items-center justify-between">
-                <span className="text-slate-500">{isAr ? "الموقع:" : "Location:"}</span>
-                <span className="font-semibold text-slate-800">{selectedLead.location}</span>
-              </div>
-
-              <div className="pt-2">
-                <label className="block text-xs font-semibold text-slate-500 mb-1">
-                  {isAr ? "ملاحظات وتفاصيل الطلب:" : "Notes & Details:"}
-                </label>
-                <p className="p-3 bg-amber-50 border border-amber-200 text-amber-900 rounded-lg text-xs leading-relaxed">
-                  {selectedLead.notes}
-                </p>
-              </div>
+            <div className="space-y-3 text-sm">
+              <p>
+                <strong className="text-slate-700">
+                  {isAr ? "رقم الهاتف:" : "Phone:"}
+                </strong>{" "}
+                {selectedLead.phone || "---"}
+              </p>
+              <p>
+                <strong className="text-slate-700">
+                  {isAr ? "نوع العقار:" : "Property:"}
+                </strong>{" "}
+                {selectedLead.propertyType || "---"}
+              </p>
+              <p>
+                <strong className="text-slate-700">
+                  {isAr ? "الموقع:" : "Location:"}
+                </strong>{" "}
+                {selectedLead.location || "---"}
+              </p>
+              <p>
+                <strong className="text-slate-700">
+                  {isAr ? "الميزانية:" : "Budget:"}
+                </strong>{" "}
+                {selectedLead.budget || "---"}
+              </p>
+              {selectedLead.notes && (
+                <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                  <strong className="text-slate-700 block mb-1">
+                    {isAr ? "ملاحظات:" : "Notes:"}
+                  </strong>
+                  <p className="text-xs text-slate-600">{selectedLead.notes}</p>
+                </div>
+              )}
             </div>
 
-            <div className="mt-6 pt-4 border-t border-slate-100 flex justify-end gap-2">
-              <button
-                onClick={() => setSelectedLead(null)}
-                className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm hover:bg-slate-200 transition"
-              >
-                {isAr ? "إغلاق" : "Close"}
-              </button>
-            </div>
+            <button
+              onClick={() => setSelectedLead(null)}
+              className="w-full py-2 mt-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg text-sm transition"
+            >
+              {isAr ? "إغلاق" : "Close"}
+            </button>
           </div>
         </div>
       )}
