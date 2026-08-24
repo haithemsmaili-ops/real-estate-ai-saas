@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { supabase } from "@/lib/supabase";
 import { jsonDb } from "@/lib/db/json-db";
 
 export async function POST(req: NextRequest) {
@@ -20,31 +21,36 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // إضافة await هنا لحل مشكلة الـ Promise
     const user = await jsonDb.getUserByEmail(userEmail);
     const tenantId = user?.id || "default";
 
-    // إضافة await عند إضافة الـ lead في قاعدة البيانات
-    const newLead = await jsonDb.addLead({
-      userEmail,
-      tenantId,
-      name: client_name,
-      phone: phone_number,
-      source: "WhatsApp (AI Agent)",
-      intentScore: 85,
-      status: "new",
-      locale: "en",
-      qualification: {
-        intent: "unknown",
-        confidence: 1.0,
-        summary: property_request || "No property request provided",
-      },
-      propertyRequest: property_request || "",
-    } as any);
+    // تنفيذ عملية Upsert لمنع تكرار الليد بناءً على رقم الهاتف
+    const { data: newLead, error } = await supabase
+      .from("leads")
+      .upsert(
+        {
+          user_email: userEmail,
+          name: client_name,
+          phone: phone_number,
+          source: "WhatsApp (AI Agent)",
+          status: "new",
+        },
+        { onConflict: "phone" }
+      )
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Supabase upsert error:", error);
+      return NextResponse.json(
+        { success: false, error: error.message },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({
       success: true,
-      message: "Lead added successfully to PropAI Dashboard",
+      message: "Lead processed successfully in PropAI Dashboard",
       lead: newLead,
     });
   } catch (error) {
