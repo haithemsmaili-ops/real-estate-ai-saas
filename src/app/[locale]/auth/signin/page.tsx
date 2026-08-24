@@ -6,7 +6,7 @@ import { getDictionary } from '@/lib/i18n/get-dictionary';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import Link from 'next/link';
-import { signIn } from 'next-auth/react';
+import { supabase } from '@/lib/supabase';
 
 export default function SignInPage() {
   const params = useParams();
@@ -29,12 +29,19 @@ export default function SignInPage() {
 
   const t = dict?.auth || {};
 
-  // تسجيل الدخول مع جوجل مع التوجيه المباشر للصفحة الرئيسية
+  // تسجيل الدخول مع جوجل باستخدام Supabase Auth
   const handleGoogleSignIn = async () => {
     setLoading(true);
     setError('');
     try {
-      await signIn('google', { callbackUrl: `/${lang}` });
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (error) throw error;
     } catch (err: any) {
       console.error(err);
       setError(isAr ? 'فشل تسجيل الدخول مع Google' : 'Google Sign-In failed');
@@ -56,28 +63,22 @@ export default function SignInPage() {
 
     try {
       if (isRegister) {
-        // منطق إنشاء حساب جديد
-        const registerRes = await fetch('/api/auth/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ firstName, lastName, email, password }),
+        // إنشاء حساب عبر Supabase
+        const { error: signUpError } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: { first_name: firstName, last_name: lastName },
+          },
         });
-
-        const registerData = await registerRes.json();
-        if (!registerRes.ok) {
-          throw new Error(registerData.error || (isAr ? 'فشل إنشاء الحساب' : 'Failed to register'));
-        }
-      }
-
-      // تسجيل الدخول بالاعتمادات
-      const result = await signIn('credentials', {
-        email,
-        password,
-        redirect: false,
-      });
-
-      if (result?.error) {
-        throw new Error(result.error);
+        if (signUpError) throw signUpError;
+      } else {
+        // تسجيل الدخول عبر Supabase
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        if (signInError) throw signInError;
       }
 
       // التوجيه فوراً إلى الصفحة الرئيسية بعد نجاح الدخول/الإنشاء
