@@ -7,7 +7,7 @@ const LOCALE_COOKIE = "NEXT_LOCALE";
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Skip API routes, static files, and Next.js internals
+  // 1. استثناء API والملفات الثابتة
   if (
     pathname.startsWith("/api") ||
     pathname.startsWith("/_next") ||
@@ -17,6 +17,23 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // 2. التحقق من وجود توكن تسجيل الدخول (Auth Token) في الـ Cookies لحماية لوحة التحكم
+  const hasAuthToken =
+    request.cookies.has("sb-access-token") ||
+    request.cookies.has("supabase-auth-token") ||
+    Array.from(request.cookies.getAll()).some((cookie) =>
+      cookie.name.includes("auth-token")
+    );
+
+  // إذا حاول الزائر دخول /dashboard بدون توكن تسجيل الدخول، حوّله لصفحة الدخول
+  if (pathname.includes("/dashboard") && !hasAuthToken) {
+    const localeMatch = pathname.split("/")[1];
+    const locale = isValidLocale(localeMatch) ? localeMatch : defaultLocale;
+    const loginUrl = new URL(`/${locale}/login`, request.url);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  // 3. معالجة بادئة اللغة (Locale Prefix)
   const pathnameLocale = pathname.split("/")[1];
   const hasLocalePrefix = isValidLocale(pathnameLocale);
 
@@ -26,7 +43,6 @@ export function middleware(request: NextRequest) {
     return response;
   }
 
-  // Redirect root or non-prefixed paths to default locale or cookie preference
   const cookieLocale = request.cookies.get(LOCALE_COOKIE)?.value;
   const locale =
     cookieLocale && isValidLocale(cookieLocale) ? cookieLocale : defaultLocale;
