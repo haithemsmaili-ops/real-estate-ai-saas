@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { jsonDb } from "@/lib/db/json-db";
+import { jsonDb, PropertyRecord } from "@/lib/db/json-db";
 
 export async function GET(req: NextRequest) {
   try {
@@ -13,11 +13,11 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Fetch properties for the agent
-    const properties = jsonDb.getProperties(userEmail);
+    // إضائة await هنا تحل مشكلة Property 'filter' does not exist on type 'Promise'
+    const properties = await jsonDb.getProperties(userEmail);
 
-    // Filter properties to return active ones (status === 'available')
-    const activeProperties = properties.filter((p) => p.status === "available");
+    // إضافة النوع (p: PropertyRecord) يحل أخطاء Parameter 'p' implicitly has an 'any' type
+    const activeProperties = properties.filter((p: PropertyRecord) => p.status === "available");
 
     if (activeProperties.length === 0) {
       return NextResponse.json({
@@ -28,8 +28,7 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    // Format properties for n8n AI Agent tool
-    const formattedProperties = activeProperties.map((p) => {
+    const formattedProperties = activeProperties.map((p: PropertyRecord) => {
       const specsList: string[] = [];
       if (p.bedrooms !== undefined && p.bedrooms !== null) specsList.push(`${p.bedrooms} Beds`);
       if (p.bathrooms !== undefined && p.bathrooms !== null) specsList.push(`${p.bathrooms} Baths`);
@@ -50,8 +49,7 @@ export async function GET(req: NextRequest) {
       };
     });
 
-    // Format a clean, human-readable list string directly for the n8n AI Agent tool
-    const textList = formattedProperties.map((p, idx) => {
+    const textList = formattedProperties.map((p: { id: string; title: string; price: string; location: string; specs: string; description: string }, idx: number) => {
       return `Listing ${idx + 1}: ${p.title} - Price: ${p.price} - Location: ${p.location} - Specs: ${p.specs} - Details: ${p.description || "N/A"}`;
     }).join("\n\n");
 

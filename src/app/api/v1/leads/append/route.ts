@@ -20,12 +20,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Try to lookup user/tenant details for appropriate tenantId assignment, or fallback
-    const user = jsonDb.getUserByEmail(userEmail);
+    // إضافة await هنا لحل مشكلة الـ Promise
+    const user = await jsonDb.getUserByEmail(userEmail);
     const tenantId = user?.id || "default";
 
-    // Add new lead via jsonDb
-    const newLead = jsonDb.addLead({
+    // إضافة await عند إضافة الـ lead في قاعدة البيانات
+    const newLead = await jsonDb.addLead({
       userEmail,
       tenantId,
       name: client_name,
@@ -33,14 +33,12 @@ export async function POST(req: NextRequest) {
       source: "WhatsApp (AI Agent)",
       intentScore: 85,
       status: "new",
-      locale: "en", // Default to English for international search or auto-detect if needed
-      // Store property request in qualification summary so it displays in Lead Detail views
+      locale: "en",
       qualification: {
         intent: "unknown",
         confidence: 1.0,
         summary: property_request || "No property request provided",
       },
-      // Direct field backup
       propertyRequest: property_request || "",
     } as any);
 

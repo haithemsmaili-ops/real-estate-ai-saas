@@ -7,12 +7,20 @@ export async function DELETE(
 ) {
     try {
         const { id } = await params;
-        const properties = jsonDb.getProperties();
-        const filtered = properties.filter((p) => p.id !== id);
-        jsonDb.saveProperties(filtered);
+
+        // حذف العقار مباشرة من قاعدة البيانات Supabase
+        const success = await jsonDb.deleteProperty(id);
+
+        if (!success) {
+            return NextResponse.json(
+                { error: "Failed to delete property from database" },
+                { status: 500 }
+            );
+        }
 
         return NextResponse.json({ success: true });
     } catch (error) {
+        console.error("Delete Property Error:", error);
         return NextResponse.json(
             { error: "Failed to delete property" },
             { status: 500 }

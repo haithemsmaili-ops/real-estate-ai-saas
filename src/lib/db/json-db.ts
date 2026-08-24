@@ -3,7 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+export const supabase = createClient(supabaseUrl, supabaseKey);
 
 export interface UserRecord {
   id: string;
@@ -50,14 +50,14 @@ export interface PropertyRecord {
 export interface LeadRecord {
   id: string;
   userEmail: string;
-  tenantId: string;
+  tenantId?: string;
   name: string;
   email?: string;
   phone?: string;
   source: string;
   status: 'new' | 'pending' | 'qualified' | 'converted';
-  intentScore: number;
-  locale: string;
+  intentScore?: number;
+  locale?: string;
   createdAt: string;
 }
 
