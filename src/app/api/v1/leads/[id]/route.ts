@@ -1,13 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@supabase/supabase-js";
 
-// 1. تحديث حالة العميل (مثلاً: تم التعامل معه / مكتمل)
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+// PATCH: تحديث حالة العميل
 export async function PATCH(
     req: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const { id } = params;
+        const { id } = await params; // await لفك الـ Promise
         const body = await req.json();
         const { status } = body;
 
@@ -19,22 +23,22 @@ export async function PATCH(
             .single();
 
         if (error) {
-            return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+            return NextResponse.json({ success: false, error: error.message }, { status: 400 });
         }
 
         return NextResponse.json({ success: true, lead: data });
-    } catch (error) {
-        return NextResponse.json({ success: false, error: "Failed to update lead" }, { status: 500 });
+    } catch (err: any) {
+        return NextResponse.json({ success: false, error: err.message }, { status: 500 });
     }
 }
 
-// 2. حذف العميل
+// DELETE: حذف العميل
 export async function DELETE(
     req: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const { id } = params;
+        const { id } = await params; // await لفك الـ Promise
 
         const { error } = await supabase
             .from("leads")
@@ -42,11 +46,11 @@ export async function DELETE(
             .eq("id", id);
 
         if (error) {
-            return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+            return NextResponse.json({ success: false, error: error.message }, { status: 400 });
         }
 
-        return NextResponse.json({ success: true, message: "Lead deleted successfully" });
-    } catch (error) {
-        return NextResponse.json({ success: false, error: "Failed to delete lead" }, { status: 500 });
+        return NextResponse.json({ success: true });
+    } catch (err: any) {
+        return NextResponse.json({ success: false, error: err.message }, { status: 500 });
     }
 }
