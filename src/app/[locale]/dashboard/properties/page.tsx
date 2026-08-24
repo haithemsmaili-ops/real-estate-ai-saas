@@ -1,14 +1,68 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { PropertyRecord } from "@/lib/db/json-db";
 import { Plus, Trash2, Home, Bed, Bath, Maximize, MapPin, DollarSign, X } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
+
+// تعريف واجهة البيانات المخصصة للعقار لمنع خطأ الاستيراد
+interface PropertyRecord {
+  id: string;
+  title: string;
+  description?: string;
+  listingType?: string;
+  propertyType?: string;
+  price?: string;
+  numericPrice?: number;
+  currency?: string;
+  country?: string;
+  city?: string;
+  district?: string;
+  address?: string;
+  location?: string;
+  area?: number;
+  areaUnit?: string;
+  bedrooms?: number;
+  bathrooms?: number;
+  status?: string;
+}
 
 export default function PropertiesPage() {
   const [properties, setProperties] = useState<PropertyRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+
+  const supabase = createClient();
+
+  useEffect(() => {
+    async function getUserAndFetch() {
+      // جلب بيانات الحساب الحالي الموثق عبر SSR Helper
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (user?.email) {
+        setUserEmail(user.email);
+        fetchProperties(user.email);
+      } else {
+        setLoading(false);
+      }
+    }
+    getUserAndFetch();
+  }, []);
+
+  const fetchProperties = async (email: string) => {
+    try {
+      const res = await fetch(`/api/properties?userEmail=${encodeURIComponent(email)}`);
+      if (res.ok) {
+        const data = await res.json();
+        setProperties(data);
+      }
+    } catch (err) {
+      console.error("Failed to load properties", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Form State
   const [formData, setFormData] = useState({
@@ -30,29 +84,11 @@ export default function PropertiesPage() {
     status: "available",
   });
 
-  const fetchProperties = async () => {
-    try {
-      const res = await fetch("/api/properties");
-      if (res.ok) {
-        const data = await res.json();
-        setProperties(data);
-      }
-    } catch (err) {
-      console.error("Failed to load properties", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchProperties();
-  }, []);
-
   const handleDelete = async (id: string) => {
     if (!confirm("هل أنت تأكد من رغبتك في حذف هذا العقار؟")) return;
 
     try {
-      const res = await fetch(`/api/properties/${id}`, {
+      const res = await fetch(`/api/properties/${id}?userEmail=${encodeURIComponent(userEmail || "")}`, {
         method: "DELETE",
       });
 
@@ -69,11 +105,17 @@ export default function PropertiesPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!userEmail) {
+      alert("تعذر التعرف على بيانات الحساب الحالي");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
       const payload = {
         ...formData,
+        userEmail,
         numericPrice: Number(formData.price) || 0,
         area: Number(formData.area) || 0,
         bedrooms: Number(formData.bedrooms) || 0,
@@ -107,7 +149,7 @@ export default function PropertiesPage() {
           legalStatus: "freehold",
           status: "available",
         });
-        fetchProperties();
+        fetchProperties(userEmail);
       } else {
         alert("فشل في إضافة العقار");
       }
@@ -209,7 +251,7 @@ export default function PropertiesPage() {
         </div>
       )}
 
-      {/* Add Property Modal */}
+      {/* Modal Form */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white rounded-2xl max-w-2xl w-full p-6 space-y-6 shadow-2xl relative my-8">

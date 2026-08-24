@@ -4,20 +4,24 @@ import { jsonDb, PropertyRecord } from "@/lib/db/json-db";
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const userEmail = searchParams.get("userEmail") || searchParams.get("email") || "";
+    const userEmail =
+      searchParams.get("userEmail") || searchParams.get("email") || "";
 
     if (!userEmail) {
       return NextResponse.json(
-        { success: false, error: "Missing required parameter: userEmail or email" },
+        {
+          success: false,
+          error: "Missing required parameter: userEmail or email",
+        },
         { status: 400 }
       );
     }
 
-    // إضائة await هنا تحل مشكلة Property 'filter' does not exist on type 'Promise'
     const properties = await jsonDb.getProperties(userEmail);
 
-    // إضافة النوع (p: PropertyRecord) يحل أخطاء Parameter 'p' implicitly has an 'any' type
-    const activeProperties = properties.filter((p: PropertyRecord) => p.status === "available");
+    const activeProperties = properties.filter(
+      (p: PropertyRecord) => p.status === "available"
+    );
 
     if (activeProperties.length === 0) {
       return NextResponse.json({
@@ -30,11 +34,16 @@ export async function GET(req: NextRequest) {
 
     const formattedProperties = activeProperties.map((p: PropertyRecord) => {
       const specsList: string[] = [];
-      if (p.bedrooms !== undefined && p.bedrooms !== null) specsList.push(`${p.bedrooms} Beds`);
-      if (p.bathrooms !== undefined && p.bathrooms !== null) specsList.push(`${p.bathrooms} Baths`);
-      if (p.area !== undefined && p.area !== null) specsList.push(`${p.area} ${p.areaUnit || "sqm"}`);
-      if (p.floorNumber !== undefined && p.floorNumber !== null) specsList.push(`Floor ${p.floorNumber}`);
-      if (p.parkingSpaces !== undefined && p.parkingSpaces !== null) specsList.push(`${p.parkingSpaces} Parking`);
+      if (p.bedrooms !== undefined && p.bedrooms !== null)
+        specsList.push(`${p.bedrooms} Beds`);
+      if (p.bathrooms !== undefined && p.bathrooms !== null)
+        specsList.push(`${p.bathrooms} Baths`);
+      if (p.area !== undefined && p.area !== null)
+        specsList.push(`${p.area} ${p.areaUnit || "sqm"}`);
+      if (p.floorNumber !== undefined && p.floorNumber !== null)
+        specsList.push(`Floor ${p.floorNumber}`);
+      if (p.parkingSpaces !== undefined && p.parkingSpaces !== null)
+        specsList.push(`${p.parkingSpaces} Parking`);
       if (p.legalStatus) specsList.push(`Status: ${p.legalStatus}`);
 
       return {
@@ -42,16 +51,36 @@ export async function GET(req: NextRequest) {
         title: p.title,
         type: p.listingType || p.type || "sale",
         propertyType: p.propertyType || "apartment",
-        price: p.numericPrice ? `${p.numericPrice.toLocaleString()} ${p.currency || "USD"}` : p.price,
-        location: p.location || [p.district, p.city, p.country].filter(Boolean).join(", ") || "N/A",
+        price: p.numericPrice
+          ? `${p.numericPrice.toLocaleString()} ${p.currency || "USD"}`
+          : p.price,
+        location:
+          p.location ||
+          [p.district, p.city, p.country].filter(Boolean).join(", ") ||
+          "N/A",
         specs: specsList.join(", ") || "N/A",
         description: p.description || "",
       };
     });
 
-    const textList = formattedProperties.map((p: { id: string; title: string; price: string; location: string; specs: string; description: string }, idx: number) => {
-      return `Listing ${idx + 1}: ${p.title} - Price: ${p.price} - Location: ${p.location} - Specs: ${p.specs} - Details: ${p.description || "N/A"}`;
-    }).join("\n\n");
+    const textList = formattedProperties
+      .map(
+        (
+          p: {
+            id: string;
+            title: string;
+            price: string;
+            location: string;
+            specs: string;
+            description: string;
+          },
+          idx: number
+        ) => {
+          return `Listing ${idx + 1
+            }: ${p.title} - Price: ${p.price} - Location: ${p.location} - Specs: ${p.specs} - Details: ${p.description || "N/A"}`;
+        }
+      )
+      .join("\n\n");
 
     return NextResponse.json({
       success: true,
@@ -62,7 +91,11 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     console.error("Error searching properties:", error);
     return NextResponse.json(
-      { success: false, error: "Failed to search properties", text: "Error searching properties." },
+      {
+        success: false,
+        error: "Failed to search properties",
+        text: "Error searching properties.",
+      },
       { status: 500 }
     );
   }
