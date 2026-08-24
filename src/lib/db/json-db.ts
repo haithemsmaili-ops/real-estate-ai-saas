@@ -137,35 +137,57 @@ export const jsonDb = {
       id: p.id,
       userEmail: p.user_email,
       title: p.title,
+      description: p.description || '',
       type: p.listing_type || 'sale',
       listingType: p.listing_type || 'sale',
       propertyType: p.property_type || 'apartment',
-      price: p.price || '0',
+      price: p.price || String(p.numeric_price || '0'),
+      numericPrice: p.numeric_price ? Number(p.numeric_price) : undefined,
+      currency: p.currency || 'USD',
       location: p.location || '',
+      city: p.city || '',
+      district: p.district || '',
+      country: p.country || '',
+      bedrooms: p.bedrooms ? Number(p.bedrooms) : undefined,
+      bathrooms: p.bathrooms ? Number(p.bathrooms) : undefined,
+      area: p.area ? Number(p.area) : undefined,
+      areaUnit: p.area_unit || 'sqm',
       status: p.status || 'available',
       createdAt: p.created_at,
     }));
   },
 
-  async addProperty(property: Omit<PropertyRecord, 'id' | 'createdAt'> & { userEmail: string }) {
+  async addProperty(property: any) {
+    const propertyPayload: any = {
+      user_email: (property.userEmail || property.user_email || '').toLowerCase(),
+      title: property.title || '',
+      description: property.description || '',
+      listing_type: property.type || property.listingType || property.listing_type || 'sale',
+      property_type: property.propertyType || property.property_type || 'apartment',
+      price: String(property.price || property.numericPrice || '0'),
+      currency: property.currency || 'USD',
+      location: property.location || [property.district, property.city, property.country].filter(Boolean).join(', ') || 'N/A',
+      status: property.status || 'available',
+    };
+
+    if (property.numericPrice || property.price) propertyPayload.numeric_price = Number(property.numericPrice || property.price || 0);
+    if (property.city) propertyPayload.city = property.city;
+    if (property.district) propertyPayload.district = property.district;
+    if (property.country) propertyPayload.country = property.country;
+    if (property.area) propertyPayload.area = Number(property.area);
+    if (property.areaUnit) propertyPayload.area_unit = property.areaUnit;
+    if (property.bedrooms) propertyPayload.bedrooms = Number(property.bedrooms);
+    if (property.bathrooms) propertyPayload.bathrooms = Number(property.bathrooms);
+
     const { data, error } = await supabase
       .from('properties')
-      .insert([
-        {
-          user_email: property.userEmail,
-          title: property.title,
-          listing_type: property.type || property.listingType || 'sale',
-          property_type: property.propertyType || 'apartment',
-          price: property.price,
-          location: property.location,
-        },
-      ])
+      .insert([propertyPayload])
       .select()
       .single();
 
     if (error) {
       console.error("[Supabase Insert Error]:", error);
-      throw error;
+      return null;
     }
     return data;
   },
