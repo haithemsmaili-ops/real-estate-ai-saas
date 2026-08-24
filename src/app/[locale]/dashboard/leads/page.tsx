@@ -15,6 +15,13 @@ import {
   Calendar,
   Trash2,
   CheckCircle2,
+  Eye,
+  X,
+  MapPin,
+  DollarSign,
+  Home,
+  Tag,
+  Building,
 } from "lucide-react";
 
 interface Lead {
@@ -29,6 +36,13 @@ interface Lead {
   locale?: string;
   createdAt?: string;
   created_at?: string;
+  // تفاصيل العقار والميزانية
+  dealType?: string; // buy / rent (شراء / إيجار)
+  propertyType?: string; // apartment, villa, etc.
+  budget?: string | number; // الميزانية
+  location?: string; // المنطقة / المدينة
+  requirements?: string; // تفاصيل وملخص الذكاء الاصطناعي
+  metadata?: any; // أي بيانات إضافية مخزنة في JSON
 }
 
 export default function LeadsPage() {
@@ -41,6 +55,9 @@ export default function LeadsPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [error, setError] = useState("");
+
+  // العميل المختار لفتح النافذة المنبثقة التفصيلية
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
 
   useEffect(() => {
     getDictionary(locale as any)
@@ -68,7 +85,6 @@ export default function LeadsPage() {
     }
   };
 
-  // دالة لتغيير حالة العميل (تبديل بين مكتمل/جديد)
   const handleUpdateStatus = async (id: string, currentStatus: string) => {
     const newStatus = currentStatus === "converted" ? "new" : "converted";
     try {
@@ -89,7 +105,6 @@ export default function LeadsPage() {
     }
   };
 
-  // دالة لحذف العميل
   const handleDeleteLead = async (id: string) => {
     if (
       !confirm(
@@ -118,20 +133,17 @@ export default function LeadsPage() {
       case "completed":
         return "bg-emerald-50 text-emerald-700 border-emerald-200";
       case "qualified":
-      case "mouatel":
         return "bg-purple-50 text-purple-700 border-purple-200";
       case "pending":
-      case "moraqaba":
         return "bg-amber-50 text-amber-700 border-amber-200";
       case "new":
-      case "jadid":
       default:
         return "bg-blue-50 text-blue-700 border-blue-200";
     }
   };
 
   const getStatusText = (s: string) => {
-    if (!s) return "جديد";
+    if (!s) return isAr ? "جديد" : "New";
     if (isAr) {
       if (s === "converted" || s === "completed") return "تم التعامل معه";
       if (s === "qualified") return "مؤهل";
@@ -163,7 +175,9 @@ export default function LeadsPage() {
         lead.phone?.toLowerCase().includes(query) ||
         lead.email?.toLowerCase().includes(query) ||
         lead.source?.toLowerCase().includes(query) ||
-        lead.status?.toLowerCase().includes(query)
+        lead.status?.toLowerCase().includes(query) ||
+        lead.location?.toLowerCase().includes(query) ||
+        lead.dealType?.toLowerCase().includes(query)
       );
     })
     : [];
@@ -210,8 +224,8 @@ export default function LeadsPage() {
               type="text"
               placeholder={
                 isAr
-                  ? "البحث بالاسم، الهاتف، البريد أو القناة..."
-                  : "Search by name, phone, channel..."
+                  ? "البحث بالاسم، الموقع، نوع العقار..."
+                  : "Search by name, location, property..."
               }
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -245,6 +259,9 @@ export default function LeadsPage() {
                     {isAr ? "العميل" : "Client"}
                   </th>
                   <th className="px-6 py-3.5 font-semibold text-right">
+                    {isAr ? "طلب العميل (شراء/إيجار)" : "Request Type"}
+                  </th>
+                  <th className="px-6 py-3.5 font-semibold text-right">
                     {isAr ? "معلومات الاتصال" : "Contact Info"}
                   </th>
                   <th className="px-6 py-3.5 font-semibold text-right">
@@ -255,9 +272,6 @@ export default function LeadsPage() {
                   </th>
                   <th className="px-6 py-3.5 font-semibold text-right">
                     {isAr ? "الحالة" : "Status"}
-                  </th>
-                  <th className="px-6 py-3.5 font-semibold text-right">
-                    {isAr ? "التاريخ" : "Date"}
                   </th>
                   <th className="px-6 py-3.5 font-semibold text-center">
                     {isAr ? "إجراءات" : "Actions"}
@@ -270,17 +284,50 @@ export default function LeadsPage() {
                     lead.createdAt || lead.created_at || new Date().toISOString();
                   const score = lead.intentScore ?? 85;
 
+                  // استخراج قيم الطلب والميزانية (إذا كانت مخزنة في metadata أو حقول مباشرة)
+                  const dealType = lead.dealType || lead.metadata?.deal_type || "شراء";
+                  const budget = lead.budget || lead.metadata?.budget || "غير محدد";
+                  const location = lead.location || lead.metadata?.location || "غير محدد";
+                  const propType = lead.propertyType || lead.metadata?.property_type || "عقار";
+
                   return (
                     <tr
                       key={lead.id}
-                      className="hover:bg-surface-50/50 transition-colors"
+                      className="hover:bg-surface-50/80 transition-colors group cursor-pointer"
+                      onClick={() => setSelectedLead(lead)}
                     >
-                      <td className="px-6 py-4 font-bold text-surface-900">
+                      {/* اسم العميل والملاحظة السريعة عند الحوم (Hover Tooltip) */}
+                      <td className="px-6 py-4 font-bold text-surface-900 relative">
                         <div className="flex items-center gap-2">
                           <div className="h-8 w-8 rounded-full bg-brand-50 text-brand-700 font-bold flex items-center justify-center text-xs">
                             {lead.name?.charAt(0) || "U"}
                           </div>
-                          <span>{lead.name}</span>
+                          <div>
+                            <span className="group-hover:text-brand-600 transition-colors">
+                              {lead.name}
+                            </span>
+                            {/* تلميح عند الوقوف بالماوس */}
+                            <div className="hidden group-hover:block absolute z-20 start-12 top-12 w-64 p-3 bg-slate-900 text-white text-xs rounded-xl shadow-xl border border-slate-700 pointer-events-none">
+                              <p className="font-semibold text-brand-400 mb-1">💡 ملخص طلب العميل:</p>
+                              <p>📌 النوع: {dealType} ({propType})</p>
+                              <p>💰 الميزانية: {budget}</p>
+                              <p>📍 المنطقة: {location}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* ملخص طلب العميل (شراء/إيجار + المكان) */}
+                      <td className="px-6 py-4">
+                        <div className="flex flex-col text-xs space-y-1">
+                          <span className="inline-flex items-center gap-1 font-semibold text-slate-800">
+                            <Tag className="h-3 w-3 text-brand-500" />
+                            {dealType} - {propType}
+                          </span>
+                          <span className="text-surface-500 flex items-center gap-1">
+                            <MapPin className="h-3 w-3 text-red-400" />
+                            {location}
+                          </span>
                         </div>
                       </td>
 
@@ -318,7 +365,7 @@ export default function LeadsPage() {
                           >
                             {score}%
                           </span>
-                          <div className="w-16 bg-surface-100 rounded-full h-1.5 overflow-hidden">
+                          <div className="w-14 bg-surface-100 rounded-full h-1.5 overflow-hidden">
                             <div
                               className={`h-full rounded-full ${score >= 80
                                   ? "bg-amber-500"
@@ -345,24 +392,21 @@ export default function LeadsPage() {
                         </span>
                       </td>
 
-                      <td className="px-6 py-4 text-surface-500 text-xs font-medium">
-                        <span className="flex items-center justify-end gap-1.5">
-                          <span>
-                            {new Date(dateVal).toLocaleDateString(
-                              locale === "ar" ? "ar-DZ" : "en-US",
-                              {
-                                month: "short",
-                                day: "numeric",
-                                year: "numeric",
-                              }
-                            )}
-                          </span>
-                          <Calendar className="h-3.5 w-3.5 text-surface-400" />
-                        </span>
-                      </td>
+                      <td
+                        className="px-6 py-4 text-center"
+                        onClick={(e) => e.stopPropagation()} // منع فتح Modal عند الضغط على الأزرار
+                      >
+                        <div className="flex items-center justify-center gap-1.5">
+                          {/* زر معاينة تفاصيل العميل */}
+                          <button
+                            onClick={() => setSelectedLead(lead)}
+                            title={isAr ? "عرض التفاصيل الكاملة" : "View Details"}
+                            className="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </button>
 
-                      <td className="px-6 py-4 text-center">
-                        <div className="flex items-center justify-center gap-2">
+                          {/* زر تغيير الحالة */}
                           <button
                             onClick={() =>
                               handleUpdateStatus(lead.id, lead.status)
@@ -376,6 +420,8 @@ export default function LeadsPage() {
                           >
                             <CheckCircle2 className="h-4 w-4" />
                           </button>
+
+                          {/* زر الحذف */}
                           <button
                             onClick={() => handleDeleteLead(lead.id)}
                             title={isAr ? "حذف العميل" : "Delete Lead"}
@@ -393,6 +439,118 @@ export default function LeadsPage() {
           )}
         </div>
       </div>
+
+      {/* -------------------- النافذة المنبثقة لتفاصيل العميل (Lead Details Modal) -------------------- */}
+      {selectedLead && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-surface-200 space-y-6 relative">
+            {/* زر الإغلاق */}
+            <button
+              onClick={() => setSelectedLead(null)}
+              className="absolute top-5 left-5 p-2 text-surface-400 hover:text-surface-700 rounded-full hover:bg-surface-100 transition-colors"
+            >
+              <X className="h-5 w-5" />
+            </button>
+
+            {/* الهيدر */}
+            <div className="flex items-center gap-4 border-b border-surface-100 pb-4">
+              <div className="h-12 w-12 rounded-2xl bg-brand-100 text-brand-700 font-bold flex items-center justify-center text-lg shadow-inner">
+                {selectedLead.name?.charAt(0) || "U"}
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-surface-900">
+                  {selectedLead.name}
+                </h3>
+                <p className="text-xs text-surface-500 flex items-center gap-2 mt-0.5">
+                  <span>{selectedLead.phone || "بدون رقم هاتف"}</span>
+                  <span>•</span>
+                  <span>{selectedLead.email || "بدون بريد"}</span>
+                </p>
+              </div>
+            </div>
+
+            {/* كروت تفاصيل طلب العقار والميزانية */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="p-3.5 rounded-2xl bg-surface-50 border border-surface-100">
+                <span className="text-xs text-surface-400 flex items-center gap-1 mb-1">
+                  <Tag className="h-3.5 w-3.5 text-brand-500" />
+                  {isAr ? "نوع الطلب" : "Deal Type"}
+                </span>
+                <p className="font-bold text-surface-800 text-sm capitalize">
+                  {selectedLead.dealType || selectedLead.metadata?.deal_type || (isAr ? "شراء" : "Purchase")}
+                </p>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-surface-50 border border-surface-100">
+                <span className="text-xs text-surface-400 flex items-center gap-1 mb-1">
+                  <Building className="h-3.5 w-3.5 text-blue-500" />
+                  {isAr ? "نوع العقار" : "Property Type"}
+                </span>
+                <p className="font-bold text-surface-800 text-sm">
+                  {selectedLead.propertyType || selectedLead.metadata?.property_type || (isAr ? "شقة / فيلا" : "Apartment")}
+                </p>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-emerald-50/60 border border-emerald-100">
+                <span className="text-xs text-emerald-600 flex items-center gap-1 mb-1">
+                  <DollarSign className="h-3.5 w-3.5" />
+                  {isAr ? "الميزانية المحددة" : "Budget"}
+                </span>
+                <p className="font-bold text-emerald-800 text-sm">
+                  {selectedLead.budget || selectedLead.metadata?.budget || (isAr ? "حسب العرض" : "Negotiable")}
+                </p>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-purple-50/60 border border-purple-100">
+                <span className="text-xs text-purple-600 flex items-center gap-1 mb-1">
+                  <MapPin className="h-3.5 w-3.5" />
+                  {isAr ? "المنطقة / المدينة" : "Location"}
+                </span>
+                <p className="font-bold text-purple-800 text-sm">
+                  {selectedLead.location || selectedLead.metadata?.location || (isAr ? "غير محددة" : "Not specified")}
+                </p>
+              </div>
+            </div>
+
+            {/* ملخص المساعد الذكي / متطلبات خاصة */}
+            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+              <h4 className="text-xs font-bold text-slate-700 mb-1.5 flex items-center gap-1.5">
+                <MessageSquare className="h-4 w-4 text-brand-600" />
+                {isAr ? "ملخص طلب العميل والمحادثة:" : "AI Conversation Summary:"}
+              </h4>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                {selectedLead.requirements ||
+                  selectedLead.metadata?.summary ||
+                  (isAr
+                    ? "أبدى العميل اهتماماً كبيراً بالعقارات المعروضة وقام المساعد الذكي بتسجيل بيانات التواصل والميزانية المبدئية."
+                    : "Lead showed high interest during AI agent interaction.")}
+              </p>
+            </div>
+
+            {/* أزرار الإجراء السريع */}
+            <div className="flex gap-3 pt-2">
+              {selectedLead.phone && (
+                <a
+                  href={`https://wa.me/${selectedLead.phone.replace(/[^0-9]/g, "")}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-colors"
+                >
+                  <MessageSquare className="h-4 w-4" />
+                  <span>{isAr ? "تواصل عبر واتساب" : "Chat via WhatsApp"}</span>
+                </a>
+              )}
+              <Button
+                onClick={() => setSelectedLead(null)}
+                variant="outline"
+                className="flex-1 text-xs py-2.5 rounded-xl"
+              >
+                {isAr ? "إغلاق" : "Close"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
