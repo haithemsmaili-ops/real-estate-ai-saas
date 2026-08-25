@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Plus, Trash2, Home, Bed, Bath, Maximize, MapPin, DollarSign, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
-// تعريف واجهة البيانات المخصصة للعقار لمنع خطأ الاستيراد
+// تعريف واجهة البيانات المخصصة للعقار
 interface PropertyRecord {
   id: string;
   title: string;
@@ -37,7 +37,6 @@ export default function PropertiesPage() {
 
   useEffect(() => {
     async function getUserAndFetch() {
-      // جلب بيانات الحساب الحالي الموثق عبر SSR Helper
       const { data: { user } } = await supabase.auth.getUser();
 
       if (user?.email) {
@@ -55,7 +54,30 @@ export default function PropertiesPage() {
       const res = await fetch(`/api/properties?userEmail=${encodeURIComponent(email)}`);
       if (res.ok) {
         const data = await res.json();
-        setProperties(data);
+
+        // تحويل الحقول من snake_case (المسترجعة من Supabase) إلى camelCase
+        const formattedProperties: PropertyRecord[] = data.map((item: any) => ({
+          id: item.id,
+          title: item.title,
+          description: item.description,
+          listingType: item.listing_type,
+          propertyType: item.property_type,
+          price: item.price,
+          numericPrice: item.numeric_price,
+          currency: item.currency,
+          country: item.country,
+          city: item.city,
+          district: item.district,
+          address: item.address,
+          location: item.location,
+          area: item.area,
+          areaUnit: item.area_unit,
+          bedrooms: item.bedrooms,
+          bathrooms: item.bathrooms,
+          status: item.status,
+        }));
+
+        setProperties(formattedProperties);
       }
     } catch (err) {
       console.error("Failed to load properties", err);
@@ -120,7 +142,7 @@ export default function PropertiesPage() {
         area: Number(formData.area) || 0,
         bedrooms: Number(formData.bedrooms) || 0,
         bathrooms: Number(formData.bathrooms) || 0,
-        location: [formData.district, formData.city, formData.country].filter(Boolean).join(", ") || formData.address || "N/A",
+        location: [formData.district, formData.city, formData.country].filter(Boolean).join(", ") || formData.address || "غير محدد",
       };
 
       const res = await fetch("/api/properties", {

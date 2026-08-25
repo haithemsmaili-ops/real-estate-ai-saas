@@ -9,8 +9,11 @@ const supabase = createClient(
 
 export async function GET(req: NextRequest) {
   try {
+    const { searchParams } = new URL(req.url);
     const session = await getServerSession();
-    const userEmail = session?.user?.email;
+
+    // إمكانية جلب البريد سواء من السلسلة أو من جلسة NextAuth
+    const userEmail = searchParams.get("userEmail") || session?.user?.email;
 
     let query = supabase.from("properties").select("*");
 
@@ -36,20 +39,35 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await getServerSession();
-    const userEmail = session?.user?.email || "anonymous@propai.com";
-
     const body = await req.json();
+    const session = await getServerSession();
 
+    const userEmail = body.userEmail || session?.user?.email || "anonymous@propai.com";
+
+    // إدراج كل البيانات القادمة من الاستمارة
     const { data: newProperty, error } = await supabase
       .from("properties")
       .insert([
         {
           user_email: userEmail,
           title: body.title || "عقار جديد",
-          listing_type: body.type === "rent" ? "rent" : "sale",
-          price: body.price || "0 دج",
+          description: body.description || "",
+          listing_type: body.listingType || "sale",
+          property_type: body.propertyType || "apartment",
+          price: body.price || "0",
+          numeric_price: body.numericPrice || 0,
+          currency: body.currency || "USD",
+          country: body.country || "",
+          city: body.city || "",
+          district: body.district || "",
+          address: body.address || "",
           location: body.location || "غير محدد",
+          area: body.area || 0,
+          area_unit: body.areaUnit || "sqm",
+          bedrooms: body.bedrooms || 0,
+          bathrooms: body.bathrooms || 0,
+          legal_status: body.legalStatus || "freehold",
+          status: body.status || "available",
         },
       ])
       .select()

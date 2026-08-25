@@ -192,9 +192,19 @@ export const jsonDb = {
     return data;
   },
 
-  async deleteProperty(id: string): Promise<boolean> {
-    const { error } = await supabase.from('properties').delete().eq('id', id);
-    return !error;
+  async deleteProperty(id: string, userEmail?: string): Promise<boolean> {
+    let query = supabase.from('properties').delete().eq('id', id);
+
+    if (userEmail) {
+      query = query.eq('user_email', userEmail.toLowerCase());
+    }
+
+    const { error } = await query;
+    if (error) {
+      console.error("[Supabase Delete Error]:", error);
+      return false;
+    }
+    return true;
   },
 
   // --- LEADS ---
