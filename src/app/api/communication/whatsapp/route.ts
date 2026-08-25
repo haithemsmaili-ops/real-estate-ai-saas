@@ -21,8 +21,32 @@ export async function POST(request: Request) {
     const payload = await request.json();
     const messages = whatsAppService.parseWebhookPayload(payload);
 
-    // TODO: Route messages to lead qualifier and omnichannel inbox
     console.info(`[WhatsApp] Received ${messages.length} message(s)`);
+
+    // معالجة وتوجيه الرسائل المسلّمة من الـ Webhook
+    for (const msg of messages) {
+      const senderPhone = msg.from;
+      // التأكد من استخراج النص بأمان لتفادي أخطاء TypeScript
+      const messageText = (msg as any).text?.body || "";
+
+      if (messageText) {
+        // توجيه الرسالة إلى Chat API الداخلي للتجاوب التلقائي وحفظ المحادثة
+        const host = request.headers.get("host") || "localhost:3000";
+        const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
+
+        await fetch(`${protocol}://${host}/api/chat`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message: messageText,
+            leadInfo: {
+              phone: senderPhone,
+              channel: "whatsapp",
+            },
+          }),
+        });
+      }
+    }
 
     return NextResponse.json({ received: true });
   } catch (error) {

@@ -12,14 +12,12 @@ import {
   MessageSquare,
   Mail,
   Phone,
-  Calendar,
   Trash2,
   CheckCircle2,
   Eye,
   X,
   MapPin,
   DollarSign,
-  Home,
   Tag,
   Building,
 } from "lucide-react";
@@ -36,13 +34,12 @@ interface Lead {
   locale?: string;
   createdAt?: string;
   created_at?: string;
-  // تفاصيل العقار والميزانية
-  dealType?: string; // buy / rent (شراء / إيجار)
-  propertyType?: string; // apartment, villa, etc.
-  budget?: string | number; // الميزانية
-  location?: string; // المنطقة / المدينة
-  requirements?: string; // تفاصيل وملخص الذكاء الاصطناعي
-  metadata?: any; // أي بيانات إضافية مخزنة في JSON
+  dealType?: string;
+  propertyType?: string;
+  budget?: string | number;
+  location?: string;
+  requirements?: string;
+  metadata?: any;
 }
 
 export default function LeadsPage() {
@@ -50,13 +47,11 @@ export default function LeadsPage() {
   const locale = (params?.locale as string) || "ar";
   const isAr = locale === "ar";
 
-  const [dict, setDict] = useState<any>(null);
+  const [, setDict] = useState<any>(null);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [error, setError] = useState("");
-
-  // العميل المختار لفتح النافذة المنبثقة التفصيلية
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
 
   useEffect(() => {
@@ -74,7 +69,6 @@ export default function LeadsPage() {
       const res = await fetch("/api/v1/leads");
       if (!res.ok) throw new Error("Failed to fetch leads");
       const data = await res.json();
-
       const leadsData = Array.isArray(data) ? data : data.leads || [];
       setLeads(leadsData);
     } catch (err) {
@@ -184,6 +178,7 @@ export default function LeadsPage() {
 
   return (
     <div className="space-y-8" dir={isAr ? "rtl" : "ltr"}>
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold tracking-tight text-surface-900">
@@ -214,6 +209,7 @@ export default function LeadsPage() {
         </div>
       )}
 
+      {/* Main Table Container */}
       <div className="bg-white rounded-2xl border border-surface-200 shadow-sm overflow-hidden">
         <div className="p-5 border-b border-surface-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="relative flex-1 max-w-md">
@@ -280,11 +276,7 @@ export default function LeadsPage() {
               </thead>
               <tbody className="divide-y divide-surface-100">
                 {filteredLeads.map((lead) => {
-                  const dateVal =
-                    lead.createdAt || lead.created_at || new Date().toISOString();
                   const score = lead.intentScore ?? 85;
-
-                  // استخراج قيم الطلب والميزانية (إذا كانت مخزنة في metadata أو حقول مباشرة)
                   const dealType = lead.dealType || lead.metadata?.deal_type || "شراء";
                   const budget = lead.budget || lead.metadata?.budget || "غير محدد";
                   const location = lead.location || lead.metadata?.location || "غير محدد";
@@ -296,7 +288,6 @@ export default function LeadsPage() {
                       className="hover:bg-surface-50/80 transition-colors group cursor-pointer"
                       onClick={() => setSelectedLead(lead)}
                     >
-                      {/* اسم العميل والملاحظة السريعة عند الحوم (Hover Tooltip) */}
                       <td className="px-6 py-4 font-bold text-surface-900 relative">
                         <div className="flex items-center gap-2">
                           <div className="h-8 w-8 rounded-full bg-brand-50 text-brand-700 font-bold flex items-center justify-center text-xs">
@@ -306,18 +297,10 @@ export default function LeadsPage() {
                             <span className="group-hover:text-brand-600 transition-colors">
                               {lead.name}
                             </span>
-                            {/* تلميح عند الوقوف بالماوس */}
-                            <div className="hidden group-hover:block absolute z-20 start-12 top-12 w-64 p-3 bg-slate-900 text-white text-xs rounded-xl shadow-xl border border-slate-700 pointer-events-none">
-                              <p className="font-semibold text-brand-400 mb-1">💡 ملخص طلب العميل:</p>
-                              <p>📌 النوع: {dealType} ({propType})</p>
-                              <p>💰 الميزانية: {budget}</p>
-                              <p>📍 المنطقة: {location}</p>
-                            </div>
                           </div>
                         </div>
                       </td>
 
-                      {/* ملخص طلب العميل (شراء/إيجار + المكان) */}
                       <td className="px-6 py-4">
                         <div className="flex flex-col text-xs space-y-1">
                           <span className="inline-flex items-center gap-1 font-semibold text-slate-800">
@@ -358,9 +341,7 @@ export default function LeadsPage() {
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-end gap-2">
                           <span
-                            className={`text-xs font-bold ${score >= 80
-                              ? "text-amber-600"
-                              : "text-surface-600"
+                            className={`text-xs font-bold ${score >= 80 ? "text-amber-600" : "text-surface-600"
                               }`}
                           >
                             {score}%
@@ -368,10 +349,10 @@ export default function LeadsPage() {
                           <div className="w-14 bg-surface-100 rounded-full h-1.5 overflow-hidden">
                             <div
                               className={`h-full rounded-full ${score >= 80
-                                ? "bg-amber-500"
-                                : score >= 50
-                                  ? "bg-blue-500"
-                                  : "bg-surface-300"
+                                  ? "bg-amber-500"
+                                  : score >= 50
+                                    ? "bg-blue-500"
+                                    : "bg-surface-300"
                                 }`}
                               style={{ width: `${score}%` }}
                             />
@@ -394,10 +375,9 @@ export default function LeadsPage() {
 
                       <td
                         className="px-6 py-4 text-center"
-                        onClick={(e) => e.stopPropagation()} // منع فتح Modal عند الضغط على الأزرار
+                        onClick={(e) => e.stopPropagation()}
                       >
                         <div className="flex items-center justify-center gap-1.5">
-                          {/* زر معاينة تفاصيل العميل */}
                           <button
                             onClick={() => setSelectedLead(lead)}
                             title={isAr ? "عرض التفاصيل الكاملة" : "View Details"}
@@ -406,7 +386,6 @@ export default function LeadsPage() {
                             <Eye className="h-4 w-4" />
                           </button>
 
-                          {/* زر تغيير الحالة */}
                           <button
                             onClick={() =>
                               handleUpdateStatus(lead.id, lead.status)
@@ -421,7 +400,6 @@ export default function LeadsPage() {
                             <CheckCircle2 className="h-4 w-4" />
                           </button>
 
-                          {/* زر الحذف */}
                           <button
                             onClick={() => handleDeleteLead(lead.id)}
                             title={isAr ? "حذف العميل" : "Delete Lead"}
@@ -440,11 +418,10 @@ export default function LeadsPage() {
         </div>
       </div>
 
-      {/* -------------------- النافذة المنبثقة لتفاصيل العميل (Lead Details Modal) -------------------- */}
+      {/* Details Modal */}
       {selectedLead && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn">
           <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-surface-200 space-y-6 relative">
-            {/* زر الإغلاق */}
             <button
               onClick={() => setSelectedLead(null)}
               className="absolute top-5 left-5 p-2 text-surface-400 hover:text-surface-700 rounded-full hover:bg-surface-100 transition-colors"
@@ -452,7 +429,6 @@ export default function LeadsPage() {
               <X className="h-5 w-5" />
             </button>
 
-            {/* الهيدر */}
             <div className="flex items-center gap-4 border-b border-surface-100 pb-4">
               <div className="h-12 w-12 rounded-2xl bg-brand-100 text-brand-700 font-bold flex items-center justify-center text-lg shadow-inner">
                 {selectedLead.name?.charAt(0) || "U"}
@@ -469,7 +445,6 @@ export default function LeadsPage() {
               </div>
             </div>
 
-            {/* كروت تفاصيل طلب العقار والميزانية */}
             <div className="grid grid-cols-2 gap-3">
               <div className="p-3.5 rounded-2xl bg-surface-50 border border-surface-100">
                 <span className="text-xs text-surface-400 flex items-center gap-1 mb-1">
@@ -477,7 +452,9 @@ export default function LeadsPage() {
                   {isAr ? "نوع الطلب" : "Deal Type"}
                 </span>
                 <p className="font-bold text-surface-800 text-sm capitalize">
-                  {selectedLead.dealType || selectedLead.metadata?.deal_type || (isAr ? "شراء" : "Purchase")}
+                  {selectedLead.dealType ||
+                    selectedLead.metadata?.deal_type ||
+                    (isAr ? "شراء" : "Purchase")}
                 </p>
               </div>
 
@@ -487,7 +464,9 @@ export default function LeadsPage() {
                   {isAr ? "نوع العقار" : "Property Type"}
                 </span>
                 <p className="font-bold text-surface-800 text-sm">
-                  {selectedLead.propertyType || selectedLead.metadata?.property_type || (isAr ? "شقة / فيلا" : "Apartment")}
+                  {selectedLead.propertyType ||
+                    selectedLead.metadata?.property_type ||
+                    (isAr ? "شقة / فيلا" : "Apartment")}
                 </p>
               </div>
 
@@ -497,7 +476,9 @@ export default function LeadsPage() {
                   {isAr ? "الميزانية المحددة" : "Budget"}
                 </span>
                 <p className="font-bold text-emerald-800 text-sm">
-                  {selectedLead.budget || selectedLead.metadata?.budget || (isAr ? "حسب العرض" : "Negotiable")}
+                  {selectedLead.budget ||
+                    selectedLead.metadata?.budget ||
+                    (isAr ? "حسب العرض" : "Negotiable")}
                 </p>
               </div>
 
@@ -507,16 +488,19 @@ export default function LeadsPage() {
                   {isAr ? "المنطقة / المدينة" : "Location"}
                 </span>
                 <p className="font-bold text-purple-800 text-sm">
-                  {selectedLead.location || selectedLead.metadata?.location || (isAr ? "غير محددة" : "Not specified")}
+                  {selectedLead.location ||
+                    selectedLead.metadata?.location ||
+                    (isAr ? "غير محددة" : "Not specified")}
                 </p>
               </div>
             </div>
 
-            {/* ملخص المساعد الذكي / متطلبات خاصة */}
             <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200">
               <h4 className="text-xs font-bold text-slate-700 mb-1.5 flex items-center gap-1.5">
                 <MessageSquare className="h-4 w-4 text-brand-600" />
-                {isAr ? "ملخص طلب العميل والمحادثة:" : "AI Conversation Summary:"}
+                {isAr
+                  ? "ملخص طلب العميل والمحادثة:"
+                  : "AI Conversation Summary:"}
               </h4>
               <p className="text-xs text-slate-600 leading-relaxed">
                 {selectedLead.requirements ||
@@ -527,11 +511,13 @@ export default function LeadsPage() {
               </p>
             </div>
 
-            {/* أزرار الإجراء السريع */}
             <div className="flex gap-3 pt-2">
               {selectedLead.phone && (
                 <a
-                  href={`https://wa.me/${selectedLead.phone.replace(/[^0-9]/g, "")}`}
+                  href={`https://wa.me/${selectedLead.phone.replace(
+                    /[^0-9]/g,
+                    ""
+                  )}`}
                   target="_blank"
                   rel="noreferrer"
                   className="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-colors"

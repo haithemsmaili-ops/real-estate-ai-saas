@@ -1,10 +1,20 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Plus, Trash2, Home, Bed, Bath, Maximize, MapPin, DollarSign, X } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
+import React, { useState, useEffect } from "react";
+import {
+  Building2,
+  Plus,
+  Search,
+  MapPin,
+  Bed,
+  Bath,
+  Maximize,
+  Trash2,
+  X,
+  Home,
+} from "lucide-react";
+import { useSession } from "next-auth/react";
 
-// تعريف واجهة البيانات المخصصة للعقار
 interface PropertyRecord {
   id: string;
   title: string;
@@ -24,46 +34,43 @@ interface PropertyRecord {
   bedrooms?: number;
   bathrooms?: number;
   status?: string;
+  images?: string[];
 }
 
 export default function PropertiesPage() {
+  const { data: session, status: sessionStatus } = useSession();
   const [properties, setProperties] = useState<PropertyRecord[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterType, setFilterType] = useState("all");
+  const [filterListing, setFilterListing] = useState("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [userEmail, setUserEmail] = useState<string | null>(null);
 
-  const supabase = createClient();
+  const userEmail = session?.user?.email || null;
 
   useEffect(() => {
-    async function getUserAndFetch() {
-      const { data: { user } } = await supabase.auth.getUser();
-
-      if (user?.email) {
-        setUserEmail(user.email);
-        fetchProperties(user.email);
-      } else {
-        setLoading(false);
-      }
+    if (sessionStatus === "authenticated" && userEmail) {
+      fetchProperties(userEmail);
+    } else if (sessionStatus === "unauthenticated") {
+      setLoading(false);
     }
-    getUserAndFetch();
-  }, []);
+  }, [sessionStatus, userEmail]);
 
   const fetchProperties = async (email: string) => {
+    setLoading(true);
     try {
       const res = await fetch(`/api/properties?userEmail=${encodeURIComponent(email)}`);
       if (res.ok) {
         const data = await res.json();
-
-        // تحويل الحقول من snake_case (المسترجعة من Supabase) إلى camelCase
-        const formattedProperties: PropertyRecord[] = data.map((item: any) => ({
+        const formattedProperties: PropertyRecord[] = (data.properties || data).map((item: any) => ({
           id: item.id,
           title: item.title,
           description: item.description,
-          listingType: item.listing_type,
-          propertyType: item.property_type,
+          listingType: item.listing_type || item.listingType,
+          propertyType: item.property_type || item.propertyType,
           price: item.price,
-          numericPrice: item.numeric_price,
+          numericPrice: item.numeric_price || item.numericPrice,
           currency: item.currency,
           country: item.country,
           city: item.city,
@@ -71,12 +78,12 @@ export default function PropertiesPage() {
           address: item.address,
           location: item.location,
           area: item.area,
-          areaUnit: item.area_unit,
+          areaUnit: item.area_unit || item.areaUnit,
           bedrooms: item.bedrooms,
           bathrooms: item.bathrooms,
           status: item.status,
+          images: item.images || [],
         }));
-
         setProperties(formattedProperties);
       }
     } catch (err) {
@@ -86,14 +93,13 @@ export default function PropertiesPage() {
     }
   };
 
-  // Form State
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     listingType: "sale",
     propertyType: "apartment",
     price: "",
-    currency: "USD",
+    currency: "DZD",
     country: "",
     city: "",
     district: "",
@@ -159,7 +165,7 @@ export default function PropertiesPage() {
           listingType: "sale",
           propertyType: "apartment",
           price: "",
-          currency: "USD",
+          currency: "DZD",
           country: "",
           city: "",
           district: "",
@@ -183,31 +189,81 @@ export default function PropertiesPage() {
     }
   };
 
+  const filteredProperties = properties.filter((prop) => {
+    const matchesSearch =
+      prop.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      prop.location?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      prop.city?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesType = filterType === "all" || prop.propertyType === filterType;
+    const matchesListing = filterListing === "all" || prop.listingType === filterListing;
+
+    return matchesSearch && matchesType && matchesListing;
+  });
+
   return (
-    <div className="p-6 space-y-6 text-right dir-rtl">
+    <div className="p-6 space-y-6 text-right dir-rtl" dir="rtl">
       {/* Header */}
       <div className="flex justify-between items-center bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">إدارة العقارات</h1>
+          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <Building2 className="h-7 w-7 text-emerald-600" />
+            إدارة العقارات
+          </h1>
           <p className="text-sm text-gray-500 mt-1">إضافة وعرض العقارات الخاصة بك في النظام</p>
         </div>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl font-medium transition-all shadow-sm"
+          className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl font-semibold text-sm transition-all shadow-sm"
         >
           <Plus className="w-5 h-5" />
           إضافة عقار جديد
         </button>
       </div>
 
+      {/* Filters & Search */}
+      <div className="flex flex-col md:flex-row gap-4 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+        <div className="relative flex-1">
+          <Search className="absolute right-3 top-3 h-4 w-4 text-gray-400" />
+          <input
+            type="text"
+            placeholder="البحث باسم العقار أو الموقع..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pr-10 pl-4 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          />
+        </div>
+        <div className="flex gap-2">
+          <select
+            value={filterListing}
+            onChange={(e) => setFilterListing(e.target.value)}
+            className="border rounded-xl px-4 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          >
+            <option value="all">كل العروض</option>
+            <option value="sale">للبيع</option>
+            <option value="rent">للإيجار</option>
+          </select>
+          <select
+            value={filterType}
+            onChange={(e) => setFilterType(e.target.value)}
+            className="border rounded-xl px-4 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          >
+            <option value="all">كل الأنواع</option>
+            <option value="apartment">شقة</option>
+            <option value="villa">فيلا</option>
+            <option value="land">أرض</option>
+            <option value="commercial">تجاري</option>
+          </select>
+        </div>
+      </div>
+
       {/* Content */}
       {loading ? (
         <div className="text-center py-12 text-gray-500">جاري تحميل العقارات...</div>
-      ) : properties.length === 0 ? (
+      ) : filteredProperties.length === 0 ? (
         <div className="bg-white p-12 rounded-2xl border border-dashed border-gray-200 text-center space-y-3">
           <Home className="w-12 h-12 text-gray-300 mx-auto" />
-          <h3 className="text-lg font-semibold text-gray-700">لا توجد عقارات مضافة بعد</h3>
-          <p className="text-sm text-gray-400">ابدأ بإضافة أول عقار في محفظتك العقارية الآن</p>
+          <h3 className="text-lg font-semibold text-gray-700">لا توجد عقارات مطابقة</h3>
+          <p className="text-sm text-gray-400">لم نجد أي عقارات بناءً على البحث أو التصفية الحالية</p>
           <button
             onClick={() => setIsModalOpen(true)}
             className="inline-flex items-center gap-2 bg-emerald-50 text-emerald-600 px-4 py-2 rounded-lg font-medium text-sm hover:bg-emerald-100 transition"
@@ -217,12 +273,11 @@ export default function PropertiesPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {properties.map((prop) => (
+          {filteredProperties.map((prop) => (
             <div key={prop.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition overflow-hidden flex flex-col justify-between">
               <div className="p-5 space-y-4">
                 <div className="flex justify-between items-start gap-2">
-                  <span className={`px-3 py-1 rounded-full text-xs font-semibold ${prop.status === "available" ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600"
-                    }`}>
+                  <span className={`px-3 py-1 rounded-full text-xs font-semibold ${prop.status === "available" ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600"}`}>
                     {prop.status === "available" ? "متاح" : prop.status}
                   </span>
                   <span className="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-md capitalize">
@@ -233,13 +288,13 @@ export default function PropertiesPage() {
                 <div>
                   <h3 className="font-bold text-gray-900 text-lg line-clamp-1">{prop.title}</h3>
                   <p className="text-sm text-gray-500 flex items-center gap-1 mt-1 line-clamp-1">
-                    <MapPin className="w-4 h-4 text-gray-400 shrink-0" />
+                    <MapPin className="w-4 h-4 text-emerald-600 shrink-0" />
                     {prop.location || `${prop.city || ""}, ${prop.country || ""}`}
                   </p>
                 </div>
 
                 <div className="text-xl font-extrabold text-emerald-600">
-                  {prop.numericPrice ? prop.numericPrice.toLocaleString() : prop.price} {prop.currency || "USD"}
+                  {prop.numericPrice ? prop.numericPrice.toLocaleString() : prop.price} {prop.currency || "DZD"}
                 </div>
 
                 <div className="grid grid-cols-3 gap-2 py-3 border-y border-gray-50 text-xs text-gray-600">
@@ -334,7 +389,7 @@ export default function PropertiesPage() {
                   <input
                     type="number"
                     required
-                    placeholder="250000"
+                    placeholder="25000000"
                     value={formData.price}
                     onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                     className="w-full border rounded-xl p-2.5 text-sm outline-none"
@@ -347,14 +402,11 @@ export default function PropertiesPage() {
                     onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
                     className="w-full border rounded-xl p-2.5 text-sm bg-white outline-none"
                   >
+                    <option value="DZD">دينار جزائري (DZD)</option>
                     <option value="USD">دولار أمريكي ($ USD)</option>
                     <option value="EUR">يورو (€ EUR)</option>
                     <option value="SAR">ريال سعودي (SAR)</option>
                     <option value="AED">درهم إماراتي (AED)</option>
-                    <option value="QAR">ريال قطري (QAR)</option>
-                    <option value="KWD">دينار كويتي (KWD)</option>
-                    <option value="EGP">جنيه مصري (EGP)</option>
-                    <option value="DZD">دينار جزائري (DZD)</option>
                   </select>
                 </div>
               </div>
@@ -364,7 +416,7 @@ export default function PropertiesPage() {
                   <label className="block text-xs font-semibold text-gray-700 mb-1">الدولة</label>
                   <input
                     type="text"
-                    placeholder="الإمارات / السعودية"
+                    placeholder="الجزائر"
                     value={formData.country}
                     onChange={(e) => setFormData({ ...formData, country: e.target.value })}
                     className="w-full border rounded-xl p-2.5 text-sm outline-none"
@@ -374,7 +426,7 @@ export default function PropertiesPage() {
                   <label className="block text-xs font-semibold text-gray-700 mb-1">المدينة</label>
                   <input
                     type="text"
-                    placeholder="دبي / الرياض"
+                    placeholder="الجزائر العاصمة"
                     value={formData.city}
                     onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                     className="w-full border rounded-xl p-2.5 text-sm outline-none"
@@ -384,7 +436,7 @@ export default function PropertiesPage() {
                   <label className="block text-xs font-semibold text-gray-700 mb-1">المنطقة/الحي</label>
                   <input
                     type="text"
-                    placeholder="وسط المدينة / النخيل"
+                    placeholder="حيدرة / دالي إبراهيم"
                     value={formData.district}
                     onChange={(e) => setFormData({ ...formData, district: e.target.value })}
                     className="w-full border rounded-xl p-2.5 text-sm outline-none"

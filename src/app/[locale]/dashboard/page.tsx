@@ -7,49 +7,70 @@ import { mockChannelStatuses } from "@/lib/db/mock-data";
 import { omnichannelService } from "@/lib/services/communication";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { jsonDb } from "@/lib/db/json-db";
+import { createClient } from "@supabase/supabase-js";
 
 interface DashboardPageProps {
   params: Promise<{ locale: string }>;
 }
+
+// تهيئة عميل Supabase على مستوى السيرفر
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 export default async function DashboardPage({ params }: DashboardPageProps) {
   const { locale: localeParam } = await params;
   const locale = isValidLocale(localeParam) ? localeParam : "en";
   const dict = await getDictionary(locale);
 
-  // 1. الحصول على جلسة المستخدم الحالية بأمان
+  // 1. الحصول على جلسة المستخدم الحالية
   const session = await getServerSession(authOptions);
-  const userEmail = session?.user?.email || "";
+  const userEmail = session?.user?.email || "demo@agency.com";
 
-  // 2. جلب البيانات الحقيقية من قاعدة البيانات باستخدام await لأن الدوال أصبحت async
-  const rawLeads = userEmail ? (await jsonDb.getLeads(userEmail)) || [] : [];
-  const rawProperties = userEmail ? (await jsonDb.getProperties(userEmail)) || [] : [];
+  // 2. جلب العقارات الخاصة بالوكالة الحالية من Supabase
+  const { count: propertiesCount } = await supabase
+    .from("properties")
+    .select("*", { count: "exact", head: true })
+    .eq("user_email", userEmail);
 
-  // 3. تأمين وتجهيز التواريخ لمنع خطأ toLocaleString
-  const userLeads = rawLeads.map((lead: any) => ({
-    ...lead,
-    createdAt: lead.createdAt ? new Date(lead.createdAt).toISOString() : new Date().toISOString(),
-    updatedAt: lead.updatedAt ? new Date(lead.updatedAt).toISOString() : new Date().toISOString(),
+  // 3. جلب محادثات وعملاء (Leads) الوكالة الحالية من Supabase
+  const { data: rawConversations } = await supabase
+    .from("conversations")
+    .select("*")
+    .eq("user_email", userEmail)
+    .order("updated_at", { ascending: false });
+
+  // 4. تجهيز وتنسيق بيانات الـ Leads لمكونات الـ UI
+  const userLeads = (rawConversations || []).map((conv: any) => ({
+    id: conv.id,
+    name: conv.lead_name || "زائر جديد",
+    email: conv.lead_email || "-",
+    phone: conv.lead_phone || "-",
+    channel: conv.channel || "widget",
+    status: conv.status || "active",
+    lastMessage: conv.last_message || "",
+    createdAt: conv.created_at ? new Date(conv.created_at).toISOString() : new Date().toISOString(),
+    updatedAt: conv.updated_at ? new Date(conv.updated_at).toISOString() : new Date().toISOString(),
   }));
 
-  // 4. حساب الإحصائيات الواقعية مع الحماية
+  // 5. حساب الإحصائيات الدقيقة
   const totalLeads = userLeads.length;
-  const totalProperties = rawProperties.length;
+  const totalProperties = propertiesCount || 0;
   const qualifiedLeads = userLeads.filter(
-    (l: any) => l.status === "qualified" || l.status === "converted"
+    (l: any) => l.status === "qualified" || l.status === "converted" || l.status === "HOT_LEAD"
   ).length;
+
   const conversionRate =
     totalLeads > 0 ? (qualifiedLeads / totalLeads) * 100 : 0;
 
   const realStats = {
-    totalLeads: totalLeads || 0,
-    totalProperties: totalProperties || 0,
-    qualifiedLeads: qualifiedLeads || 0,
-    conversionRate: Math.round(conversionRate) || 0,
+    totalLeads,
+    totalProperties,
+    qualifiedLeads,
+    conversionRate: Math.round(conversionRate),
   };
 
-  // 5. جلب حالة القنوات مع الحماية من القيم الفارغة
+  // 6. جلب حالة قنوات التواصل
   let channelStatuses: Array<{ channel: string; connected: boolean }> = [];
   try {
     const rawStatuses = omnichannelService.getChannelStatuses();
