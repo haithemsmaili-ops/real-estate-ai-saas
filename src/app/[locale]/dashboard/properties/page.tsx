@@ -99,15 +99,15 @@ export default function PropertiesPage() {
     listingType: "sale",
     propertyType: "apartment",
     price: "",
-    currency: "DZD",
+    currency: "USD",
     country: "",
     city: "",
     district: "",
     address: "",
     area: "",
     areaUnit: "sqm",
-    bedrooms: "1",
-    bathrooms: "1",
+    bedrooms: "",
+    bathrooms: "",
     legalStatus: "freehold",
     status: "available",
   });
@@ -148,7 +148,7 @@ export default function PropertiesPage() {
         area: Number(formData.area) || 0,
         bedrooms: Number(formData.bedrooms) || 0,
         bathrooms: Number(formData.bathrooms) || 0,
-        location: [formData.district, formData.city, formData.country].filter(Boolean).join(", ") || formData.address || "غير محدد",
+        location: [formData.district, formData.city, formData.country].filter(Boolean).join(", ") || formData.address || "",
       };
 
       const res = await fetch("/api/properties", {
@@ -165,15 +165,15 @@ export default function PropertiesPage() {
           listingType: "sale",
           propertyType: "apartment",
           price: "",
-          currency: "DZD",
+          currency: "USD",
           country: "",
           city: "",
           district: "",
           address: "",
           area: "",
           areaUnit: "sqm",
-          bedrooms: "1",
-          bathrooms: "1",
+          bedrooms: "",
+          bathrooms: "",
           legalStatus: "freehold",
           status: "available",
         });
@@ -294,7 +294,7 @@ export default function PropertiesPage() {
                 </div>
 
                 <div className="text-xl font-extrabold text-emerald-600">
-                  {prop.numericPrice ? prop.numericPrice.toLocaleString() : prop.price} {prop.currency || "DZD"}
+                  {prop.numericPrice ? prop.numericPrice.toLocaleString() : prop.price} {prop.currency || "USD"}
                 </div>
 
                 <div className="grid grid-cols-3 gap-2 py-3 border-y border-gray-50 text-xs text-gray-600">
@@ -345,7 +345,7 @@ export default function PropertiesPage() {
                 <input
                   type="text"
                   required
-                  placeholder="مثال: فيلا فاخرة مطلة على البحر"
+                  placeholder=""
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   className="w-full border rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
@@ -389,7 +389,7 @@ export default function PropertiesPage() {
                   <input
                     type="number"
                     required
-                    placeholder="25000000"
+                    placeholder=""
                     value={formData.price}
                     onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                     className="w-full border rounded-xl p-2.5 text-sm outline-none"
@@ -402,11 +402,13 @@ export default function PropertiesPage() {
                     onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
                     className="w-full border rounded-xl p-2.5 text-sm bg-white outline-none"
                   >
-                    <option value="DZD">دينار جزائري (DZD)</option>
                     <option value="USD">دولار أمريكي ($ USD)</option>
                     <option value="EUR">يورو (€ EUR)</option>
-                    <option value="SAR">ريال سعودي (SAR)</option>
+                    <option value="GBP">جنيه إسترليني (£ GBP)</option>
+                    <option value="CAD">دولار كندي ($ CAD)</option>
                     <option value="AED">درهم إماراتي (AED)</option>
+                    <option value="SAR">ريال سعودي (SAR)</option>
+                    <option value="DZD">دينار جزائري (DZD)</option>
                   </select>
                 </div>
               </div>
@@ -416,7 +418,7 @@ export default function PropertiesPage() {
                   <label className="block text-xs font-semibold text-gray-700 mb-1">الدولة</label>
                   <input
                     type="text"
-                    placeholder="الجزائر"
+                    placeholder=""
                     value={formData.country}
                     onChange={(e) => setFormData({ ...formData, country: e.target.value })}
                     className="w-full border rounded-xl p-2.5 text-sm outline-none"
@@ -426,7 +428,7 @@ export default function PropertiesPage() {
                   <label className="block text-xs font-semibold text-gray-700 mb-1">المدينة</label>
                   <input
                     type="text"
-                    placeholder="الجزائر العاصمة"
+                    placeholder=""
                     value={formData.city}
                     onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                     className="w-full border rounded-xl p-2.5 text-sm outline-none"
@@ -436,7 +438,7 @@ export default function PropertiesPage() {
                   <label className="block text-xs font-semibold text-gray-700 mb-1">المنطقة/الحي</label>
                   <input
                     type="text"
-                    placeholder="حيدرة / دالي إبراهيم"
+                    placeholder=""
                     value={formData.district}
                     onChange={(e) => setFormData({ ...formData, district: e.target.value })}
                     className="w-full border rounded-xl p-2.5 text-sm outline-none"
@@ -449,7 +451,7 @@ export default function PropertiesPage() {
                   <label className="block text-xs font-semibold text-gray-700 mb-1">المساحة</label>
                   <input
                     type="number"
-                    placeholder="120"
+                    placeholder=""
                     value={formData.area}
                     onChange={(e) => setFormData({ ...formData, area: e.target.value })}
                     className="w-full border rounded-xl p-2.5 text-sm outline-none"
@@ -470,6 +472,7 @@ export default function PropertiesPage() {
                   <label className="block text-xs font-semibold text-gray-700 mb-1">الغرف</label>
                   <input
                     type="number"
+                    placeholder=""
                     value={formData.bedrooms}
                     onChange={(e) => setFormData({ ...formData, bedrooms: e.target.value })}
                     className="w-full border rounded-xl p-2.5 text-sm outline-none"
@@ -479,6 +482,7 @@ export default function PropertiesPage() {
                   <label className="block text-xs font-semibold text-gray-700 mb-1">الحمامات</label>
                   <input
                     type="number"
+                    placeholder=""
                     value={formData.bathrooms}
                     onChange={(e) => setFormData({ ...formData, bathrooms: e.target.value })}
                     className="w-full border rounded-xl p-2.5 text-sm outline-none"
@@ -490,7 +494,7 @@ export default function PropertiesPage() {
                 <label className="block text-xs font-semibold text-gray-700 mb-1">الوصف</label>
                 <textarea
                   rows={2}
-                  placeholder="تفاصيل إضافية حول العقار..."
+                  placeholder=""
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   className="w-full border rounded-xl p-2.5 text-sm outline-none resize-none"
