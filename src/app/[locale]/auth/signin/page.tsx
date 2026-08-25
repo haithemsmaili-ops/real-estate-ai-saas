@@ -6,7 +6,7 @@ import { getDictionary } from '@/lib/i18n/get-dictionary';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import Link from 'next/link';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 
 export default function SignInPage() {
   const params = useParams();
@@ -18,6 +18,9 @@ export default function SignInPage() {
   const [isRegister, setIsRegister] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // إنشاء العميل المخصص للمتصفح لدعم الجلسات والـ Cookies بشكل صحيحة
+  const supabase = createClient();
 
   useEffect(() => {
     if (lang) {

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
 
 export async function GET(request: Request) {
     const { searchParams, origin } = new URL(request.url)
@@ -7,12 +8,47 @@ export async function GET(request: Request) {
     const next = searchParams.get('next') ?? '/'
 
     if (code) {
+        const cookieStore = await cookies()
+
+        // إنشاء Supabase Client مخصص للـ Server Handlers يتعامل مع الكوكيز مباشرة
+        const supabase = createServerClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+            {
+                cookies: {
+                    getAll() {
+                        return cookieStore.getAll()
+                    },
+                    setAll(cookiesToSet) {
+                        try {
+                            cookiesToSet.forEach(({ name, value, options }) =>
+                                cookieStore.set(name, value, options)
+                            )
+                        } catch {
+                            // يتم تجاهل الخطيء إذا تم استدعاء setAll من Server Component غير قابل للتعديل
+                        }
+                    },
+                },
+            }
+        )
+
         const { error } = await supabase.auth.exchangeCodeForSession(code)
 
         if (!error) {
-            return NextResponse.redirect(`${origin}${next}`)
+            // التوجيه إلى المسار المطلوب بعد تبادل الـ Session بنجاح
+            const forwardedHost = request.headers.get('x-forwarded-host')
+            const isLocalEnv = process.env.NODE_ENV === 'development'
+
+            if (isLocalEnv) {
+                return NextResponse.redirect(`${origin}${next}`)
+            } else if (forwardedHost) {
+                return NextResponse.redirect(`https://${forwardedHost}${next}`)
+            } else {
+                return NextResponse.redirect(`${origin}${next}`)
+            }
         }
     }
 
+    // التوجيه إلى صفحة تسجيل الدخول في حال وجود خطأ
     return NextResponse.redirect(`${origin}/login?error=auth-code-error`)
 }
