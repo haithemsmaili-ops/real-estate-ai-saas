@@ -62,9 +62,9 @@
       "basic": {
         "name": "1. Basic Agent",
         "badge": null,
-        "anchorSetup": "$520",
+        "anchorSetup": "$399",
         "anchorMonthly": "$260/mo",
-        "setupPrice": "$399",
+        "setupPrice": "$199",
         "monthlyPrice": "$199/mo",
         "cta": "Select This Plan",
         "guarantee": null,
