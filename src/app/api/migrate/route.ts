@@ -29,6 +29,12 @@ export async function GET() {
       "ALTER TABLE public.properties ADD COLUMN IF NOT EXISTS latitude DOUBLE PRECISION;",
       "ALTER TABLE public.properties ADD COLUMN IF NOT EXISTS longitude DOUBLE PRECISION;",
       "ALTER TABLE public.properties ADD COLUMN IF NOT EXISTS map_url TEXT;",
+      "ALTER TABLE public.properties ADD COLUMN IF NOT EXISTS rent_period TEXT;",
+      "ALTER TABLE public.properties ADD COLUMN IF NOT EXISTS living_rooms INTEGER;",
+      "ALTER TABLE public.properties ADD COLUMN IF NOT EXISTS kitchens INTEGER;",
+      "ALTER TABLE public.properties ADD COLUMN IF NOT EXISTS floor_number INTEGER;",
+      "ALTER TABLE public.properties ADD COLUMN IF NOT EXISTS total_floors INTEGER;",
+      "ALTER TABLE public.properties ADD COLUMN IF NOT EXISTS parking_spaces INTEGER;",
       "CREATE INDEX IF NOT EXISTS idx_properties_coords ON public.properties(latitude, longitude);",
     ];
 

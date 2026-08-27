@@ -69,6 +69,25 @@ async function handleUpdate(
       // Always store arrays — guarantees videos column never stays null
       images: body.images !== undefined ? (Array.isArray(body.images) ? body.images : []) : undefined,
       videos: body.videos !== undefined ? (Array.isArray(body.videos) ? body.videos : []) : undefined,
+      // Extended optional specs — included only when present in the body
+      rent_period: (body.rentPeriod !== undefined || body.rent_period !== undefined)
+        ? ((body.rentPeriod || body.rent_period) ? String(body.rentPeriod || body.rent_period).trim() : null)
+        : undefined,
+      living_rooms: body.livingRooms !== undefined
+        ? (body.livingRooms !== "" && body.livingRooms !== null ? parseIntNumber(body.livingRooms) : null)
+        : undefined,
+      kitchens: body.kitchens !== undefined
+        ? (body.kitchens !== "" && body.kitchens !== null ? parseIntNumber(body.kitchens) : null)
+        : undefined,
+      floor_number: body.floorNumber !== undefined
+        ? (body.floorNumber !== "" && body.floorNumber !== null ? parseIntNumber(body.floorNumber) : null)
+        : undefined,
+      total_floors: body.totalFloors !== undefined
+        ? (body.totalFloors !== "" && body.totalFloors !== null ? parseIntNumber(body.totalFloors) : null)
+        : undefined,
+      parking_spaces: body.parkingSpaces !== undefined
+        ? (body.parkingSpaces !== "" && body.parkingSpaces !== null ? parseIntNumber(body.parkingSpaces) : null)
+        : undefined,
     };
 
     // Remove undefined values to construct a clean patch/update payload

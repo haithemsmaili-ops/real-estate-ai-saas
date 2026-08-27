@@ -76,6 +76,14 @@ export async function POST(request: Request) {
     const parsedLongitude = parseNumber(body.longitude ?? body.lng);
     const parsedMapUrl = body.mapUrl || body.map_url ? String(body.mapUrl || body.map_url).trim() : null;
 
+    // Extended spec fields — optional, null if omitted
+    const parsedLivingRooms = body.livingRooms !== undefined && body.livingRooms !== null && body.livingRooms !== "" ? parseIntNumber(body.livingRooms) : null;
+    const parsedKitchens = body.kitchens !== undefined && body.kitchens !== null && body.kitchens !== "" ? parseIntNumber(body.kitchens) : null;
+    const parsedFloorNumber = body.floorNumber !== undefined && body.floorNumber !== null && body.floorNumber !== "" ? parseIntNumber(body.floorNumber) : null;
+    const parsedTotalFloors = body.totalFloors !== undefined && body.totalFloors !== null && body.totalFloors !== "" ? parseIntNumber(body.totalFloors) : null;
+    const parsedParkingSpaces = body.parkingSpaces !== undefined && body.parkingSpaces !== null && body.parkingSpaces !== "" ? parseIntNumber(body.parkingSpaces) : null;
+    const rentPeriod = (body.rentPeriod || body.rent_period) ? String(body.rentPeriod || body.rent_period).trim() : null;
+
     // Cleanly extract images & videos arrays
     const cleanImages = Array.isArray(body.images) ? body.images : [];
     const cleanVideos = Array.isArray(body.videos) ? body.videos : [];
@@ -103,6 +111,13 @@ export async function POST(request: Request) {
       images: Array.isArray(cleanImages) ? cleanImages : [],
       videos: Array.isArray(cleanVideos) ? cleanVideos : [],
       user_email: String(userEmail).toLowerCase().trim(),
+      // Extended optional specs (null if not provided)
+      ...(rentPeriod !== null && { rent_period: rentPeriod }),
+      ...(parsedLivingRooms !== null && { living_rooms: parsedLivingRooms }),
+      ...(parsedKitchens !== null && { kitchens: parsedKitchens }),
+      ...(parsedFloorNumber !== null && { floor_number: parsedFloorNumber }),
+      ...(parsedTotalFloors !== null && { total_floors: parsedTotalFloors }),
+      ...(parsedParkingSpaces !== null && { parking_spaces: parsedParkingSpaces }),
     };
 
     const fullInsertData: Record<string, unknown> = { ...baseInsertData };

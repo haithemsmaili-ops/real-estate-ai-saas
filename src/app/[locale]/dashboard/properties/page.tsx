@@ -45,6 +45,7 @@ interface PropertyRecord {
   price?: string;
   numericPrice?: number;
   currency?: string;
+  rentPeriod?: string;
   country?: string;
   city?: string;
   district?: string;
@@ -54,6 +55,11 @@ interface PropertyRecord {
   areaUnit?: string;
   bedrooms?: number;
   bathrooms?: number;
+  livingRooms?: number;
+  kitchens?: number;
+  floorNumber?: number;
+  totalFloors?: number;
+  parkingSpaces?: number;
   latitude?: number;
   longitude?: number;
   mapUrl?: string;
@@ -89,6 +95,7 @@ export default function PropertiesPage() {
       propertyType: prop.propertyType || "apartment",
       price: prop.price || "",
       currency: prop.currency || "USD",
+      rentPeriod: prop.rentPeriod || "monthly",
       country: prop.country || "",
       city: prop.city || "",
       district: prop.district || "",
@@ -97,6 +104,11 @@ export default function PropertiesPage() {
       areaUnit: prop.areaUnit || "sqm",
       bedrooms: prop.bedrooms !== undefined && prop.bedrooms !== null ? String(prop.bedrooms) : "",
       bathrooms: prop.bathrooms !== undefined && prop.bathrooms !== null ? String(prop.bathrooms) : "",
+      livingRooms: prop.livingRooms !== undefined && prop.livingRooms !== null ? String(prop.livingRooms) : "",
+      kitchens: prop.kitchens !== undefined && prop.kitchens !== null ? String(prop.kitchens) : "",
+      floorNumber: prop.floorNumber !== undefined && prop.floorNumber !== null ? String(prop.floorNumber) : "",
+      totalFloors: prop.totalFloors !== undefined && prop.totalFloors !== null ? String(prop.totalFloors) : "",
+      parkingSpaces: prop.parkingSpaces !== undefined && prop.parkingSpaces !== null ? String(prop.parkingSpaces) : "",
       legalStatus: prop.legalStatus || "freehold",
       status: prop.status || "available",
       latitude: prop.latitude,
@@ -133,6 +145,7 @@ export default function PropertiesPage() {
           price: item.price,
           numericPrice: item.numeric_price || item.numericPrice,
           currency: item.currency,
+          rentPeriod: item.rent_period || item.rentPeriod,
           country: item.country,
           city: item.city,
           district: item.district,
@@ -142,6 +155,11 @@ export default function PropertiesPage() {
           areaUnit: item.area_unit || item.areaUnit,
           bedrooms: item.bedrooms,
           bathrooms: item.bathrooms,
+          livingRooms: item.living_rooms ?? item.livingRooms,
+          kitchens: item.kitchens,
+          floorNumber: item.floor_number ?? item.floorNumber,
+          totalFloors: item.total_floors ?? item.totalFloors,
+          parkingSpaces: item.parking_spaces ?? item.parkingSpaces,
           latitude: item.latitude !== undefined && item.latitude !== null ? Number(item.latitude) : undefined,
           longitude: item.longitude !== undefined && item.longitude !== null ? Number(item.longitude) : undefined,
           mapUrl: item.map_url || item.mapUrl,
@@ -166,6 +184,7 @@ export default function PropertiesPage() {
     propertyType: string;
     price: string;
     currency: string;
+    rentPeriod: string;
     country: string;
     city: string;
     district: string;
@@ -174,6 +193,11 @@ export default function PropertiesPage() {
     areaUnit: string;
     bedrooms: string;
     bathrooms: string;
+    livingRooms: string;
+    kitchens: string;
+    floorNumber: string;
+    totalFloors: string;
+    parkingSpaces: string;
     legalStatus: string;
     status: string;
     latitude?: number;
@@ -188,6 +212,7 @@ export default function PropertiesPage() {
     propertyType: "apartment",
     price: "",
     currency: "USD",
+    rentPeriod: "monthly",
     country: "",
     city: "",
     district: "",
@@ -196,6 +221,11 @@ export default function PropertiesPage() {
     areaUnit: "sqm",
     bedrooms: "",
     bathrooms: "",
+    livingRooms: "",
+    kitchens: "",
+    floorNumber: "",
+    totalFloors: "",
+    parkingSpaces: "",
     legalStatus: "freehold",
     status: "available",
     latitude: undefined,
@@ -241,6 +271,12 @@ export default function PropertiesPage() {
         area: Number(formData.area) || 0,
         bedrooms: Number(formData.bedrooms) || 0,
         bathrooms: Number(formData.bathrooms) || 0,
+        livingRooms: formData.livingRooms !== "" ? Number(formData.livingRooms) : undefined,
+        kitchens: formData.kitchens !== "" ? Number(formData.kitchens) : undefined,
+        floorNumber: formData.floorNumber !== "" ? Number(formData.floorNumber) : undefined,
+        totalFloors: formData.totalFloors !== "" ? Number(formData.totalFloors) : undefined,
+        parkingSpaces: formData.parkingSpaces !== "" ? Number(formData.parkingSpaces) : undefined,
+        rentPeriod: (formData.listingType === "rent" || formData.listingType === "short_term") ? formData.rentPeriod : undefined,
         location: [formData.district, formData.city, formData.country].filter(Boolean).join(", ") || formData.address || "",
         latitude: formData.latitude,
         longitude: formData.longitude,
@@ -271,6 +307,7 @@ export default function PropertiesPage() {
           propertyType: "apartment",
           price: "",
           currency: "USD",
+          rentPeriod: "monthly",
           country: "",
           city: "",
           district: "",
@@ -279,6 +316,11 @@ export default function PropertiesPage() {
           areaUnit: "sqm",
           bedrooms: "",
           bathrooms: "",
+          livingRooms: "",
+          kitchens: "",
+          floorNumber: "",
+          totalFloors: "",
+          parkingSpaces: "",
           legalStatus: "freehold",
           status: "available",
           latitude: undefined,
@@ -330,6 +372,7 @@ export default function PropertiesPage() {
               propertyType: "apartment",
               price: "",
               currency: "USD",
+              rentPeriod: "monthly",
               country: "",
               city: "",
               district: "",
@@ -338,6 +381,11 @@ export default function PropertiesPage() {
               areaUnit: "sqm",
               bedrooms: "",
               bathrooms: "",
+              livingRooms: "",
+              kitchens: "",
+              floorNumber: "",
+              totalFloors: "",
+              parkingSpaces: "",
               legalStatus: "freehold",
               status: "available",
               latitude: undefined,
@@ -410,6 +458,7 @@ export default function PropertiesPage() {
                 propertyType: "apartment",
                 price: "",
                 currency: "USD",
+                rentPeriod: "monthly",
                 country: "",
                 city: "",
                 district: "",
@@ -418,6 +467,11 @@ export default function PropertiesPage() {
                 areaUnit: "sqm",
                 bedrooms: "",
                 bathrooms: "",
+                livingRooms: "",
+                kitchens: "",
+                floorNumber: "",
+                totalFloors: "",
+                parkingSpaces: "",
                 legalStatus: "freehold",
                 status: "available",
                 latitude: undefined,
@@ -448,25 +502,25 @@ export default function PropertiesPage() {
                 onClick={() => { setViewingProperty(prop); setViewImageIndex(0); }}
               >
                 {prop.images && prop.images.length > 0 ? (
-                <div className="relative h-48 w-full overflow-hidden bg-gray-100">
-                  <img
-                    src={prop.images[0]}
-                    alt={prop.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute top-3 right-3 flex items-center gap-1.5 z-10">
-                    <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-black/60 backdrop-blur-md text-white flex items-center gap-1">
-                      <Camera className="w-3.5 h-3.5 text-emerald-400" />
-                      {prop.images.length}
-                    </span>
-                    {prop.videos && prop.videos.length > 0 && (
+                  <div className="relative h-48 w-full overflow-hidden bg-gray-100">
+                    <img
+                      src={prop.images[0]}
+                      alt={prop.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute top-3 right-3 flex items-center gap-1.5 z-10">
                       <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-black/60 backdrop-blur-md text-white flex items-center gap-1">
-                        <Film className="w-3.5 h-3.5 text-cyan-400" />
-                        {prop.videos.length}
+                        <Camera className="w-3.5 h-3.5 text-emerald-400" />
+                        {prop.images.length}
                       </span>
-                    )}
+                      {prop.videos && prop.videos.length > 0 && (
+                        <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-black/60 backdrop-blur-md text-white flex items-center gap-1">
+                          <Film className="w-3.5 h-3.5 text-cyan-400" />
+                          {prop.videos.length}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                </div>
                 ) : (
                   <div className="relative h-32 w-full bg-gradient-to-br from-emerald-500/10 via-teal-500/10 to-cyan-500/10 flex items-center justify-center">
                     <Building2 className="w-10 h-10 text-emerald-600/30" />
@@ -502,22 +556,52 @@ export default function PropertiesPage() {
                   />
                 </div>
 
-                <div className="text-xl font-extrabold text-emerald-600">
-                  {prop.numericPrice ? prop.numericPrice.toLocaleString() : prop.price} {prop.currency || "USD"}
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xl font-extrabold text-emerald-600">
+                    {prop.numericPrice ? prop.numericPrice.toLocaleString() : prop.price} {prop.currency || 'USD'}
+                  </span>
+                  {prop.rentPeriod && (prop.listingType === 'rent' || prop.listingType === 'short_term') && (
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200">
+                      {{
+                        daily: 'يومياً',
+                        weekly: 'أسبوعياً',
+                        monthly: 'شهرياً',
+                        quarterly: 'ربع سنوي',
+                        semi_annual: 'نصف سنوي',
+                        yearly: 'سنوياً',
+                      }[prop.rentPeriod] || prop.rentPeriod}
+                    </span>
+                  )}
                 </div>
 
-                <div className="grid grid-cols-3 gap-2 py-3 border-y border-gray-50 text-xs text-gray-600">
-                  <div className="flex items-center gap-1.5">
-                    <Bed className="w-4 h-4 text-gray-400" />
-                    <span>{prop.bedrooms || 0} غرف</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Bath className="w-4 h-4 text-gray-400" />
-                    <span>{prop.bathrooms || 0} حمام</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Maximize className="w-4 h-4 text-gray-400" />
-                    <span>{prop.area || 0} {prop.areaUnit === "sqft" ? "SqFt" : "م²"}</span>
+                <div className="flex flex-wrap gap-x-3 gap-y-1 py-3 border-y border-gray-50 text-xs text-gray-600">
+                  {(prop.bedrooms ?? 0) > 0 && (
+                    <div className="flex items-center gap-1">
+                      <Bed className="w-3.5 h-3.5 text-gray-400" />
+                      <span>{prop.bedrooms} {prop.propertyType === 'commercial' || prop.propertyType === 'office' ? 'غرفة' : 'غرفة'}</span>
+                    </div>
+                  )}
+                  {(prop.bathrooms ?? 0) > 0 && (
+                    <div className="flex items-center gap-1">
+                      <Bath className="w-3.5 h-3.5 text-gray-400" />
+                      <span>{prop.bathrooms} حمام</span>
+                    </div>
+                  )}
+                  {(prop.livingRooms ?? 0) > 0 && (
+                    <div className="flex items-center gap-1">
+                      <Home className="w-3.5 h-3.5 text-gray-400" />
+                      <span>{prop.livingRooms} صالة</span>
+                    </div>
+                  )}
+                  {(prop.parkingSpaces ?? 0) > 0 && (
+                    <div className="flex items-center gap-1">
+                      <span>🚗</span>
+                      <span>{prop.parkingSpaces} موقف</span>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-1">
+                    <Maximize className="w-3.5 h-3.5 text-gray-400" />
+                    <span>{prop.area || 0} {prop.areaUnit === 'sqft' ? 'SqFt' : 'م²'}</span>
                   </div>
                 </div>
               </div>
@@ -625,9 +709,8 @@ export default function PropertiesPage() {
             <div className="p-6 space-y-5" dir="rtl">
               {/* Status badges */}
               <div className="flex gap-2 flex-wrap">
-                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                  viewingProperty.status === 'available' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'
-                }`}>
+                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${viewingProperty.status === 'available' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'
+                  }`}>
                   {viewingProperty.status === 'available' ? 'متاح' : viewingProperty.status}
                 </span>
                 <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 capitalize">
@@ -638,13 +721,27 @@ export default function PropertiesPage() {
                 </span>
               </div>
 
-              {/* Price */}
-              <div className="flex items-center gap-2">
-                <DollarSign className="w-5 h-5 text-emerald-600 shrink-0" />
-                <span className="text-2xl font-extrabold text-emerald-600">
-                  {viewingProperty.numericPrice ? viewingProperty.numericPrice.toLocaleString() : viewingProperty.price}{' '}
-                  {viewingProperty.currency || 'USD'}
-                </span>
+              {/* Price + optional rental period badge */}
+              <div className="flex items-center gap-3 flex-wrap">
+                <div className="flex items-center gap-2">
+                  <DollarSign className="w-5 h-5 text-emerald-600 shrink-0" />
+                  <span className="text-2xl font-extrabold text-emerald-600">
+                    {viewingProperty.numericPrice ? viewingProperty.numericPrice.toLocaleString() : viewingProperty.price}{' '}
+                    {viewingProperty.currency || 'USD'}
+                  </span>
+                </div>
+                {viewingProperty.rentPeriod && (viewingProperty.listingType === 'rent' || viewingProperty.listingType === 'short_term') && (
+                  <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">
+                    {{
+                      daily: 'يومياً',
+                      weekly: 'أسبوعياً',
+                      monthly: 'شهرياً',
+                      quarterly: 'ربع سنوي',
+                      semi_annual: 'نصف سنوي',
+                      yearly: 'سنوياً',
+                    }[viewingProperty.rentPeriod] || viewingProperty.rentPeriod}
+                  </span>
+                )}
               </div>
 
               {/* Location */}
@@ -655,23 +752,72 @@ export default function PropertiesPage() {
                 </div>
               )}
 
-              {/* Stats grid */}
+              {/* Dynamic Stats Grid */}
               <div className="grid grid-cols-3 gap-3 p-4 bg-gray-50 rounded-xl">
-                <div className="flex flex-col items-center gap-1">
-                  <Bed className="w-5 h-5 text-gray-400" />
-                  <span className="text-base font-bold text-gray-800">{viewingProperty.bedrooms ?? 0}</span>
-                  <span className="text-[11px] text-gray-500">غرف</span>
-                </div>
-                <div className="flex flex-col items-center gap-1">
-                  <Bath className="w-5 h-5 text-gray-400" />
-                  <span className="text-base font-bold text-gray-800">{viewingProperty.bathrooms ?? 0}</span>
-                  <span className="text-[11px] text-gray-500">حمام</span>
-                </div>
+                {/* Always: bedrooms (if > 0) */}
+                {(viewingProperty.bedrooms ?? 0) > 0 && (
+                  <div className="flex flex-col items-center gap-1">
+                    <Bed className="w-5 h-5 text-gray-400" />
+                    <span className="text-base font-bold text-gray-800">{viewingProperty.bedrooms}</span>
+                    <span className="text-[11px] text-gray-500">
+                      {viewingProperty.propertyType === 'commercial' || viewingProperty.propertyType === 'office' ? 'غرف/مكاتب' : 'غرفة'}
+                    </span>
+                  </div>
+                )}
+                {/* Always: bathrooms (if > 0) */}
+                {(viewingProperty.bathrooms ?? 0) > 0 && (
+                  <div className="flex flex-col items-center gap-1">
+                    <Bath className="w-5 h-5 text-gray-400" />
+                    <span className="text-base font-bold text-gray-800">{viewingProperty.bathrooms}</span>
+                    <span className="text-[11px] text-gray-500">حمام</span>
+                  </div>
+                )}
+                {/* Always: area */}
                 <div className="flex flex-col items-center gap-1">
                   <Maximize className="w-5 h-5 text-gray-400" />
                   <span className="text-base font-bold text-gray-800">{viewingProperty.area ?? 0}</span>
                   <span className="text-[11px] text-gray-500">{viewingProperty.areaUnit === 'sqft' ? 'SqFt' : 'م²'}</span>
                 </div>
+                {/* Conditional: living rooms */}
+                {(viewingProperty.livingRooms ?? 0) > 0 && (
+                  <div className="flex flex-col items-center gap-1">
+                    <Home className="w-5 h-5 text-gray-400" />
+                    <span className="text-base font-bold text-gray-800">{viewingProperty.livingRooms}</span>
+                    <span className="text-[11px] text-gray-500">صالة</span>
+                  </div>
+                )}
+                {/* Conditional: kitchens */}
+                {(viewingProperty.kitchens ?? 0) > 0 && (
+                  <div className="flex flex-col items-center gap-1">
+                    <span className="text-lg">🍳</span>
+                    <span className="text-base font-bold text-gray-800">{viewingProperty.kitchens}</span>
+                    <span className="text-[11px] text-gray-500">مطبخ</span>
+                  </div>
+                )}
+                {/* Conditional: floor number */}
+                {viewingProperty.floorNumber !== undefined && viewingProperty.floorNumber !== null && (
+                  <div className="flex flex-col items-center gap-1">
+                    <span className="text-lg">🏢</span>
+                    <span className="text-base font-bold text-gray-800">{viewingProperty.floorNumber}</span>
+                    <span className="text-[11px] text-gray-500">طابق رقم</span>
+                  </div>
+                )}
+                {/* Conditional: total floors */}
+                {(viewingProperty.totalFloors ?? 0) > 0 && (
+                  <div className="flex flex-col items-center gap-1">
+                    <Building2 className="w-5 h-5 text-gray-400" />
+                    <span className="text-base font-bold text-gray-800">{viewingProperty.totalFloors}</span>
+                    <span className="text-[11px] text-gray-500">طوابق</span>
+                  </div>
+                )}
+                {/* Conditional: parking spaces */}
+                {(viewingProperty.parkingSpaces ?? 0) > 0 && (
+                  <div className="flex flex-col items-center gap-1">
+                    <span className="text-lg">🚗</span>
+                    <span className="text-base font-bold text-gray-800">{viewingProperty.parkingSpaces}</span>
+                    <span className="text-[11px] text-gray-500">موقف</span>
+                  </div>
+                )}
               </div>
 
               {/* Description */}
@@ -788,7 +934,8 @@ export default function PropertiesPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              {/* Price + Currency + Rental Period */}
+              <div className={`grid gap-4 ${(formData.listingType === 'rent' || formData.listingType === 'short_term') ? 'grid-cols-3' : 'grid-cols-2'}`}>
                 <div>
                   <label className="block text-xs font-semibold text-gray-700 mb-1">السعر *</label>
                   <input
@@ -797,7 +944,7 @@ export default function PropertiesPage() {
                     placeholder=""
                     value={formData.price}
                     onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                    className="w-full border rounded-xl p-2.5 text-sm outline-none"
+                    className="w-full border rounded-xl p-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500"
                   />
                 </div>
                 <div>
@@ -805,7 +952,7 @@ export default function PropertiesPage() {
                   <select
                     value={formData.currency}
                     onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-                    className="w-full border rounded-xl p-2.5 text-sm bg-white outline-none"
+                    className="w-full border rounded-xl p-2.5 text-sm bg-white outline-none focus:ring-2 focus:ring-emerald-500"
                   >
                     <option value="USD">دولار أمريكي ($ USD)</option>
                     <option value="EUR">يورو (€ EUR)</option>
@@ -816,6 +963,26 @@ export default function PropertiesPage() {
                     <option value="DZD">دينار جزائري (DZD)</option>
                   </select>
                 </div>
+                {/* Rental Period — shown only for rent/short_term */}
+                {(formData.listingType === 'rent' || formData.listingType === 'short_term') && (
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 mb-1">
+                      فترة الإيجار
+                    </label>
+                    <select
+                      value={formData.rentPeriod}
+                      onChange={(e) => setFormData({ ...formData, rentPeriod: e.target.value })}
+                      className="w-full border rounded-xl p-2.5 text-sm bg-white outline-none focus:ring-2 focus:ring-emerald-500"
+                    >
+                      <option value="daily">يومي (Daily)</option>
+                      <option value="weekly">أسبوعي (Weekly)</option>
+                      <option value="monthly">شهري (Monthly)</option>
+                      <option value="quarterly">ربع سنوي (Quarterly)</option>
+                      <option value="semi_annual">نصف سنوي (Semi-Annual)</option>
+                      <option value="yearly">سنوي (Yearly)</option>
+                    </select>
+                  </div>
+                )}
               </div>
 
               <div className="grid grid-cols-3 gap-3">
@@ -878,48 +1045,141 @@ export default function PropertiesPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-4 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1">المساحة</label>
-                  <input
-                    type="number"
-                    placeholder=""
-                    value={formData.area}
-                    onChange={(e) => setFormData({ ...formData, area: e.target.value })}
-                    className="w-full border rounded-xl p-2.5 text-sm outline-none"
-                  />
+              {/* ── Dynamic Specs based on property type ── */}
+              <div className="space-y-3 border border-gray-100 rounded-2xl p-4 bg-gray-50/60">
+                <p className="text-xs font-bold text-gray-600 mb-2">المواصفات التفصيلية</p>
+
+                {/* Always-shown: area + unit */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 mb-1">المساحة</label>
+                    <input
+                      type="number"
+                      placeholder=""
+                      value={formData.area}
+                      onChange={(e) => setFormData({ ...formData, area: e.target.value })}
+                      className="w-full border rounded-xl p-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 mb-1">الوحدة</label>
+                    <select
+                      value={formData.areaUnit}
+                      onChange={(e) => setFormData({ ...formData, areaUnit: e.target.value })}
+                      className="w-full border rounded-xl p-2.5 text-sm bg-white outline-none focus:ring-2 focus:ring-emerald-500"
+                    >
+                      <option value="sqm">متر مربع (m²)</option>
+                      <option value="sqft">قدم مربع (SqFt)</option>
+                    </select>
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1">الوحدة</label>
-                  <select
-                    value={formData.areaUnit}
-                    onChange={(e) => setFormData({ ...formData, areaUnit: e.target.value })}
-                    className="w-full border rounded-xl p-2.5 text-sm bg-white outline-none"
-                  >
-                    <option value="sqm">متر مربع (m²)</option>
-                    <option value="sqft">قدم مربع (SqFt)</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1">الغرف</label>
-                  <input
-                    type="number"
-                    placeholder=""
-                    value={formData.bedrooms}
-                    onChange={(e) => setFormData({ ...formData, bedrooms: e.target.value })}
-                    className="w-full border rounded-xl p-2.5 text-sm outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1">الحمامات</label>
-                  <input
-                    type="number"
-                    placeholder=""
-                    value={formData.bathrooms}
-                    onChange={(e) => setFormData({ ...formData, bathrooms: e.target.value })}
-                    className="w-full border rounded-xl p-2.5 text-sm outline-none"
-                  />
-                </div>
+
+                {/* Apartment: bedrooms, bathrooms, living rooms, kitchens, floor number */}
+                {formData.propertyType === 'apartment' && (
+                  <div className="grid grid-cols-3 gap-3">
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 mb-1">غرف النوم</label>
+                      <input type="number" min="0" placeholder="0" value={formData.bedrooms}
+                        onChange={(e) => setFormData({ ...formData, bedrooms: e.target.value })}
+                        className="w-full border rounded-xl p-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500 bg-white" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 mb-1">الحمامات</label>
+                      <input type="number" min="0" placeholder="0" value={formData.bathrooms}
+                        onChange={(e) => setFormData({ ...formData, bathrooms: e.target.value })}
+                        className="w-full border rounded-xl p-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500 bg-white" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 mb-1">صالات المعيشة</label>
+                      <input type="number" min="0" placeholder="0" value={formData.livingRooms}
+                        onChange={(e) => setFormData({ ...formData, livingRooms: e.target.value })}
+                        className="w-full border rounded-xl p-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500 bg-white" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 mb-1">المطابخ</label>
+                      <input type="number" min="0" placeholder="0" value={formData.kitchens}
+                        onChange={(e) => setFormData({ ...formData, kitchens: e.target.value })}
+                        className="w-full border rounded-xl p-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500 bg-white" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 mb-1">رقم الطابق</label>
+                      <input type="number" min="0" placeholder="0" value={formData.floorNumber}
+                        onChange={(e) => setFormData({ ...formData, floorNumber: e.target.value })}
+                        className="w-full border rounded-xl p-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500 bg-white" />
+                    </div>
+                  </div>
+                )}
+
+                {/* Villa / Townhouse: bedrooms, bathrooms, living rooms, kitchens, total floors, parking */}
+                {(formData.propertyType === 'villa' || formData.propertyType === 'townhouse') && (
+                  <div className="grid grid-cols-3 gap-3">
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 mb-1">غرف النوم</label>
+                      <input type="number" min="0" placeholder="0" value={formData.bedrooms}
+                        onChange={(e) => setFormData({ ...formData, bedrooms: e.target.value })}
+                        className="w-full border rounded-xl p-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500 bg-white" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 mb-1">الحمامات</label>
+                      <input type="number" min="0" placeholder="0" value={formData.bathrooms}
+                        onChange={(e) => setFormData({ ...formData, bathrooms: e.target.value })}
+                        className="w-full border rounded-xl p-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500 bg-white" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 mb-1">صالات المعيشة</label>
+                      <input type="number" min="0" placeholder="0" value={formData.livingRooms}
+                        onChange={(e) => setFormData({ ...formData, livingRooms: e.target.value })}
+                        className="w-full border rounded-xl p-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500 bg-white" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 mb-1">المطابخ</label>
+                      <input type="number" min="0" placeholder="0" value={formData.kitchens}
+                        onChange={(e) => setFormData({ ...formData, kitchens: e.target.value })}
+                        className="w-full border rounded-xl p-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500 bg-white" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 mb-1">إجمالي الطوابق</label>
+                      <input type="number" min="0" placeholder="0" value={formData.totalFloors}
+                        onChange={(e) => setFormData({ ...formData, totalFloors: e.target.value })}
+                        className="w-full border rounded-xl p-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500 bg-white" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 mb-1">مواقف السيارات</label>
+                      <input type="number" min="0" placeholder="0" value={formData.parkingSpaces}
+                        onChange={(e) => setFormData({ ...formData, parkingSpaces: e.target.value })}
+                        className="w-full border rounded-xl p-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500 bg-white" />
+                    </div>
+                  </div>
+                )}
+
+                {/* Commercial / Office / Building: rooms/offices, bathrooms, parking */}
+                {(formData.propertyType === 'commercial' || formData.propertyType === 'office' || formData.propertyType === 'building') && (
+                  <div className="grid grid-cols-3 gap-3">
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 mb-1">غرف / مكاتب</label>
+                      <input type="number" min="0" placeholder="0" value={formData.bedrooms}
+                        onChange={(e) => setFormData({ ...formData, bedrooms: e.target.value })}
+                        className="w-full border rounded-xl p-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500 bg-white" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 mb-1">الحمامات</label>
+                      <input type="number" min="0" placeholder="0" value={formData.bathrooms}
+                        onChange={(e) => setFormData({ ...formData, bathrooms: e.target.value })}
+                        className="w-full border rounded-xl p-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500 bg-white" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 mb-1">مواقف السيارات</label>
+                      <input type="number" min="0" placeholder="0" value={formData.parkingSpaces}
+                        onChange={(e) => setFormData({ ...formData, parkingSpaces: e.target.value })}
+                        className="w-full border rounded-xl p-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500 bg-white" />
+                    </div>
+                  </div>
+                )}
+
+                {/* Land: no extra specs beyond area */}
+                {formData.propertyType === 'land' && (
+                  <p className="text-xs text-gray-400 text-center py-2">لا توجد مواصفات إضافية للأراضي — المساحة كافية.</p>
+                )}
               </div>
 
               <div>
