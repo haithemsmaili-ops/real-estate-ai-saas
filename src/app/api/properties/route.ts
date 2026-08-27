@@ -57,12 +57,17 @@ export async function POST(request: Request) {
       legalStatus,
       status,
       images,
+      videos,
       userEmail,
     } = body;
 
     if (!userEmail) {
       return NextResponse.json({ error: "User email is required" }, { status: 400 });
     }
+
+    // Cleanly extract images & videos arrays
+    const cleanImages = Array.isArray(images) ? images : [];
+    const cleanVideos = Array.isArray(videos) ? videos : [];
 
     // Cleanly extract and parse latitude, longitude, and mapUrl
     const rawLat = body.latitude ?? body.lat;
@@ -98,7 +103,8 @@ export async function POST(request: Request) {
       bathrooms: bathrooms ? Number(bathrooms) : 0,
       legal_status: legalStatus || "freehold",
       status: status || "available",
-      images: images || [],
+      images: cleanImages,
+      videos: cleanVideos,
       user_email: String(userEmail).toLowerCase(),
     };
 

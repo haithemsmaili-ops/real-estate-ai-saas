@@ -1,5 +1,5 @@
 -- =========================================================
--- Supabase Schema Migration: Add Geospatial & Map Fields
+-- Supabase Schema Migration: Add Geospatial & Media Fields
 -- Run this script in the Supabase Dashboard SQL Editor
 -- =========================================================
 
@@ -27,8 +27,9 @@ CREATE TABLE IF NOT EXISTS public.properties (
     floor_number NUMERIC,
     legal_status TEXT DEFAULT 'freehold',
     status TEXT DEFAULT 'available',
-    amenities TEXT[],
-    images TEXT[],
+    amenities TEXT[] DEFAULT '{}',
+    images TEXT[] DEFAULT '{}',
+    videos TEXT[] DEFAULT '{}',
     latitude DOUBLE PRECISION,
     longitude DOUBLE PRECISION,
     map_url TEXT,
@@ -36,11 +37,13 @@ CREATE TABLE IF NOT EXISTS public.properties (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- 2. Alter existing properties table to add geospatial columns if missing
+-- 2. Alter existing properties table to add geospatial & media columns if missing
+ALTER TABLE public.properties ADD COLUMN IF NOT EXISTS images TEXT[] DEFAULT '{}';
+ALTER TABLE public.properties ADD COLUMN IF NOT EXISTS videos TEXT[] DEFAULT '{}';
 ALTER TABLE public.properties ADD COLUMN IF NOT EXISTS latitude DOUBLE PRECISION;
 ALTER TABLE public.properties ADD COLUMN IF NOT EXISTS longitude DOUBLE PRECISION;
 ALTER TABLE public.properties ADD COLUMN IF NOT EXISTS map_url TEXT;
 
--- 3. Create spatial index for fast coordinate querying (Optional)
+-- 3. Create spatial & email index for fast querying
 CREATE INDEX IF NOT EXISTS idx_properties_user_email ON public.properties(user_email);
 CREATE INDEX IF NOT EXISTS idx_properties_coords ON public.properties(latitude, longitude);

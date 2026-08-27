@@ -44,6 +44,8 @@ export interface PropertyRecord {
   latitude?: number;
   longitude?: number;
   mapUrl?: string;
+  images?: string[];
+  videos?: string[];
   status: 'available' | 'pending' | 'sold' | 'rented';
   amenities?: string[];
   createdAt: string;
@@ -158,6 +160,8 @@ export const jsonDb = {
       latitude: p.latitude !== null && p.latitude !== undefined ? Number(p.latitude) : undefined,
       longitude: p.longitude !== null && p.longitude !== undefined ? Number(p.longitude) : undefined,
       mapUrl: p.map_url || p.mapUrl || undefined,
+      images: Array.isArray(p.images) ? p.images : [],
+      videos: Array.isArray(p.videos) ? p.videos : [],
       status: p.status || 'available',
       createdAt: p.created_at,
     }));
@@ -174,6 +178,8 @@ export const jsonDb = {
       currency: property.currency || 'USD',
       location: property.location || [property.district, property.city, property.country].filter(Boolean).join(', ') || 'N/A',
       status: property.status || 'available',
+      images: Array.isArray(property.images) ? property.images : [],
+      videos: Array.isArray(property.videos) ? property.videos : [],
     };
 
     if (property.numericPrice || property.price) basePayload.numeric_price = Number(property.numericPrice || property.price || 0);

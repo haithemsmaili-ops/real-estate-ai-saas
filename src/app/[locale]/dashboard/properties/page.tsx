@@ -12,10 +12,13 @@ import {
   Trash2,
   X,
   Home,
+  Camera,
+  Film,
 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 import PropertyMiniMap from "@/components/dashboard/PropertyMiniMap";
+import MediaUploadZone from "@/components/dashboard/MediaUploadZone";
 import { useScrollLock } from "@/lib/hooks/useScrollLock";
 
 const LocationPickerMap = dynamic(() => import("@/components/dashboard/LocationPickerMap"), {
@@ -49,8 +52,9 @@ interface PropertyRecord {
   latitude?: number;
   longitude?: number;
   mapUrl?: string;
-  status?: string;
   images?: string[];
+  videos?: string[];
+  status?: string;
 }
 
 export default function PropertiesPage() {
@@ -102,8 +106,9 @@ export default function PropertiesPage() {
           latitude: item.latitude !== undefined && item.latitude !== null ? Number(item.latitude) : undefined,
           longitude: item.longitude !== undefined && item.longitude !== null ? Number(item.longitude) : undefined,
           mapUrl: item.map_url || item.mapUrl,
+          images: Array.isArray(item.images) ? item.images : [],
+          videos: Array.isArray(item.videos) ? item.videos : [],
           status: item.status,
-          images: item.images || [],
         }));
         setProperties(formattedProperties);
       }
@@ -134,6 +139,8 @@ export default function PropertiesPage() {
     latitude?: number;
     longitude?: number;
     mapUrl: string;
+    images: string[];
+    videos: string[];
   }>({
     title: "",
     description: "",
@@ -154,6 +161,8 @@ export default function PropertiesPage() {
     latitude: undefined,
     longitude: undefined,
     mapUrl: "",
+    images: [],
+    videos: [],
   });
 
   const handleDelete = async (id: string) => {
@@ -196,6 +205,8 @@ export default function PropertiesPage() {
         latitude: formData.latitude,
         longitude: formData.longitude,
         mapUrl: formData.mapUrl,
+        images: formData.images,
+        videos: formData.videos,
       };
 
       const res = await fetch("/api/properties", {
@@ -226,6 +237,8 @@ export default function PropertiesPage() {
           latitude: undefined,
           longitude: undefined,
           mapUrl: "",
+          images: [],
+          videos: [],
         });
         fetchProperties(userEmail);
       } else {
@@ -324,7 +337,34 @@ export default function PropertiesPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProperties.map((prop) => (
-            <div key={prop.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition overflow-hidden flex flex-col justify-between">
+            <div key={prop.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition overflow-hidden flex flex-col justify-between group">
+              {/* Cover Image Header */}
+              {prop.images && prop.images.length > 0 ? (
+                <div className="relative h-48 w-full overflow-hidden bg-gray-100">
+                  <img
+                    src={prop.images[0]}
+                    alt={prop.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute top-3 right-3 flex items-center gap-1.5 z-10">
+                    <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-black/60 backdrop-blur-md text-white flex items-center gap-1">
+                      <Camera className="w-3.5 h-3.5 text-emerald-400" />
+                      {prop.images.length}
+                    </span>
+                    {prop.videos && prop.videos.length > 0 && (
+                      <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-black/60 backdrop-blur-md text-white flex items-center gap-1">
+                        <Film className="w-3.5 h-3.5 text-cyan-400" />
+                        {prop.videos.length}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div className="relative h-32 w-full bg-gradient-to-br from-emerald-500/10 via-teal-500/10 to-cyan-500/10 flex items-center justify-center">
+                  <Building2 className="w-10 h-10 text-emerald-600/30" />
+                </div>
+              )}
+
               <div className="p-5 space-y-4">
                 <div className="flex justify-between items-start gap-2">
                   <span className={`px-3 py-1 rounded-full text-xs font-semibold ${prop.status === "available" ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600"}`}>
@@ -500,6 +540,16 @@ export default function PropertiesPage() {
                     className="w-full border rounded-xl p-2.5 text-sm outline-none"
                   />
                 </div>
+              </div>
+
+              {/* Multi-Media Upload Zone (Images & Videos) */}
+              <div className="pt-2 border-t border-gray-100">
+                <MediaUploadZone
+                  images={formData.images}
+                  videos={formData.videos}
+                  onImagesChange={(imgs) => setFormData((prev) => ({ ...prev, images: imgs }))}
+                  onVideosChange={(vids) => setFormData((prev) => ({ ...prev, videos: vids }))}
+                />
               </div>
 
               {/* Map Location Picker */}
