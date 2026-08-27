@@ -31,10 +31,10 @@ export default async function LocaleLayout({
   const dir = localeDirection[locale as Locale];
 
   return (
-    <html lang={locale} dir={dir} className="h-full dark">
-      <body className="h-full bg-surface-950 text-surface-100 antialiased font-sans">
+    <html lang={locale} dir={dir} className="min-h-screen dark overflow-x-hidden">
+      <body className="min-h-screen bg-surface-950 text-surface-100 antialiased font-sans overflow-x-hidden">
         <Providers>
-          <div className="flex min-h-full flex-1 flex-col">
+          <div className="flex min-h-screen flex-1 flex-col overflow-x-hidden">
             {children}
           </div>
         </Providers>

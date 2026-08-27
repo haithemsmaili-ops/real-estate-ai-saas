@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { Check, X, Loader2 } from "lucide-react";
 
+import { useScrollLock } from "@/lib/hooks/useScrollLock";
+
 export interface LeadFormData {
   name: string;
   agency: string;
@@ -20,6 +22,8 @@ export function LeadModal({
   onClose: () => void;
   selectedPlan?: string;
 }) {
+  useScrollLock(open);
+
   const [form, setForm] = useState<LeadFormData>({
     name: "",
     agency: "",
@@ -102,11 +106,11 @@ export function LeadModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl transition-opacity"
+      className="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-xl flex items-center justify-center p-4 transition-opacity"
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-md bg-surface-900/95 border border-white/15 rounded-3xl p-6 sm:p-8 shadow-[0_20px_70px_rgba(0,0,0,0.7)] text-right dir-rtl animate-fade-in-scale"
+        className="relative w-full max-w-md max-h-[90vh] overflow-y-auto bg-surface-900/95 border border-white/15 rounded-3xl p-6 sm:p-8 shadow-[0_20px_70px_rgba(0,0,0,0.7)] text-right dir-rtl animate-fade-in-scale my-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}

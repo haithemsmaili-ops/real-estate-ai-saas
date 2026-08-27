@@ -36,8 +36,9 @@ export function UserMenu({ locale }: UserMenuProps) {
     if (!session?.user) {
         return (
             <button
+                type="button"
                 onClick={() => signIn("google", { callbackUrl: `/${locale}` })}
-                className="hidden sm:inline-flex items-center justify-center rounded-xl bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-700"
+                className="inline-flex min-h-[44px] items-center justify-center rounded-xl bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-700 active:scale-95 cursor-pointer shrink-0"
             >
                 Sign In
             </button>

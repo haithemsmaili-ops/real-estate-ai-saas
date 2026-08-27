@@ -16,6 +16,7 @@ import {
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 import PropertyMiniMap from "@/components/dashboard/PropertyMiniMap";
+import { useScrollLock } from "@/lib/hooks/useScrollLock";
 
 const LocationPickerMap = dynamic(() => import("@/components/dashboard/LocationPickerMap"), {
   ssr: false,
@@ -61,6 +62,8 @@ export default function PropertiesPage() {
   const [filterListing, setFilterListing] = useState("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useScrollLock(isModalOpen);
 
   const userEmail = session?.user?.email || null;
 
@@ -383,8 +386,8 @@ export default function PropertiesPage() {
 
       {/* Modal Form */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 space-y-6 shadow-2xl relative my-8">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-2xl max-h-[90vh] overflow-y-auto w-full p-6 space-y-6 shadow-2xl relative my-auto">
             <div className="flex justify-between items-center border-b pb-4">
               <h2 className="text-xl font-bold text-gray-800">إضافة عقار جديد</h2>
               <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-600">

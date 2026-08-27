@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { getDictionary } from "@/lib/i18n/get-dictionary";
 import { Button } from "@/components/ui/Button";
+import { useScrollLock } from "@/lib/hooks/useScrollLock";
 import {
   Users,
   Search,
@@ -53,6 +54,8 @@ export default function LeadsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [error, setError] = useState("");
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+
+  useScrollLock(!!selectedLead);
 
   useEffect(() => {
     getDictionary(locale as any)
@@ -420,8 +423,8 @@ export default function LeadsPage() {
 
       {/* Details Modal */}
       {selectedLead && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-surface-200 space-y-6 relative">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
+          <div className="bg-white rounded-3xl max-w-lg max-h-[90vh] overflow-y-auto w-full p-6 shadow-2xl border border-surface-200 space-y-6 relative my-auto">
             <button
               onClick={() => setSelectedLead(null)}
               className="absolute top-5 left-5 p-2 text-surface-400 hover:text-surface-700 rounded-full hover:bg-surface-100 transition-colors"
