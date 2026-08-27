@@ -10,6 +10,7 @@ import {
   Bath,
   Maximize,
   Trash2,
+  Pencil,
   X,
   Home,
   Camera,
@@ -55,6 +56,7 @@ interface PropertyRecord {
   images?: string[];
   videos?: string[];
   status?: string;
+  legalStatus?: string;
 }
 
 export default function PropertiesPage() {
@@ -66,10 +68,41 @@ export default function PropertiesPage() {
   const [filterListing, setFilterListing] = useState("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingPropertyId, setEditingPropertyId] = useState<string | null>(null);
 
   useScrollLock(isModalOpen);
 
   const userEmail = session?.user?.email || null;
+
+  const handleEditClick = (prop: PropertyRecord) => {
+    setFormData({
+      title: prop.title || "",
+      description: prop.description || "",
+      listingType: prop.listingType || "sale",
+      propertyType: prop.propertyType || "apartment",
+      price: prop.price || "",
+      currency: prop.currency || "USD",
+      country: prop.country || "",
+      city: prop.city || "",
+      district: prop.district || "",
+      address: prop.address || "",
+      area: prop.area !== undefined && prop.area !== null ? String(prop.area) : "",
+      areaUnit: prop.areaUnit || "sqm",
+      bedrooms: prop.bedrooms !== undefined && prop.bedrooms !== null ? String(prop.bedrooms) : "",
+      bathrooms: prop.bathrooms !== undefined && prop.bathrooms !== null ? String(prop.bathrooms) : "",
+      legalStatus: prop.legalStatus || "freehold",
+      status: prop.status || "available",
+      latitude: prop.latitude,
+      longitude: prop.longitude,
+      mapUrl: prop.mapUrl || "",
+      images: Array.isArray(prop.images) ? prop.images : [],
+      videos: Array.isArray(prop.videos) ? prop.videos : [],
+    });
+    setEditingPropertyId(prop.id);
+    setIsEditing(true);
+    setIsModalOpen(true);
+  };
 
   useEffect(() => {
     if (sessionStatus === "authenticated" && userEmail) {
@@ -109,6 +142,7 @@ export default function PropertiesPage() {
           images: Array.isArray(item.images) ? item.images : [],
           videos: Array.isArray(item.videos) ? item.videos : [],
           status: item.status,
+          legalStatus: item.legal_status || item.legalStatus || "freehold",
         }));
         setProperties(formattedProperties);
       }
@@ -209,14 +243,21 @@ export default function PropertiesPage() {
         videos: formData.videos,
       };
 
-      const res = await fetch("/api/properties", {
-        method: "POST",
+      const url = isEditing
+        ? `/api/properties/${editingPropertyId}?userEmail=${encodeURIComponent(userEmail)}`
+        : "/api/properties";
+      const method = isEditing ? "PUT" : "POST";
+
+      const res = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
       if (res.ok) {
         setIsModalOpen(false);
+        setIsEditing(false);
+        setEditingPropertyId(null);
         setFormData({
           title: "",
           description: "",
@@ -242,7 +283,7 @@ export default function PropertiesPage() {
         });
         fetchProperties(userEmail);
       } else {
-        alert("فشل في إضافة العقار");
+        alert(isEditing ? "فشل في تعديل العقار" : "فشل في إضافة العقار");
       }
     } catch (err) {
       console.error(err);
@@ -275,7 +316,34 @@ export default function PropertiesPage() {
           <p className="text-sm text-gray-500 mt-1">إضافة وعرض العقارات الخاصة بك في النظام</p>
         </div>
         <button
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => {
+            setFormData({
+              title: "",
+              description: "",
+              listingType: "sale",
+              propertyType: "apartment",
+              price: "",
+              currency: "USD",
+              country: "",
+              city: "",
+              district: "",
+              address: "",
+              area: "",
+              areaUnit: "sqm",
+              bedrooms: "",
+              bathrooms: "",
+              legalStatus: "freehold",
+              status: "available",
+              latitude: undefined,
+              longitude: undefined,
+              mapUrl: "",
+              images: [],
+              videos: [],
+            });
+            setIsEditing(false);
+            setEditingPropertyId(null);
+            setIsModalOpen(true);
+          }}
           className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl font-semibold text-sm transition-all shadow-sm"
         >
           <Plus className="w-5 h-5" />
@@ -328,7 +396,34 @@ export default function PropertiesPage() {
           <h3 className="text-lg font-semibold text-gray-700">لا توجد عقارات مطابقة</h3>
           <p className="text-sm text-gray-400">لم نجد أي عقارات بناءً على البحث أو التصفية الحالية</p>
           <button
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => {
+              setFormData({
+                title: "",
+                description: "",
+                listingType: "sale",
+                propertyType: "apartment",
+                price: "",
+                currency: "USD",
+                country: "",
+                city: "",
+                district: "",
+                address: "",
+                area: "",
+                areaUnit: "sqm",
+                bedrooms: "",
+                bathrooms: "",
+                legalStatus: "freehold",
+                status: "available",
+                latitude: undefined,
+                longitude: undefined,
+                mapUrl: "",
+                images: [],
+                videos: [],
+              });
+              setIsEditing(false);
+              setEditingPropertyId(null);
+              setIsModalOpen(true);
+            }}
             className="inline-flex items-center gap-2 bg-emerald-50 text-emerald-600 px-4 py-2 rounded-lg font-medium text-sm hover:bg-emerald-100 transition"
           >
             إضافة عقار الآن
@@ -411,13 +506,22 @@ export default function PropertiesPage() {
 
               <div className="p-4 bg-gray-50 border-t border-gray-100 flex justify-between items-center">
                 <span className="text-xs text-gray-400 capitalize">{prop.propertyType || "شقة"}</span>
-                <button
-                  onClick={() => handleDelete(prop.id)}
-                  className="text-red-500 hover:text-red-700 p-1.5 rounded-lg hover:bg-red-50 transition"
-                  title="حذف العقار"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleEditClick(prop)}
+                    className="text-gray-500 hover:text-emerald-600 p-1.5 rounded-lg hover:bg-gray-100 transition"
+                    title="تعديل العقار"
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(prop.id)}
+                    className="text-red-500 hover:text-red-700 p-1.5 rounded-lg hover:bg-red-50 transition"
+                    title="حذف العقار"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </div>
           ))}
@@ -429,7 +533,9 @@ export default function PropertiesPage() {
         <div className="fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-2xl max-h-[90vh] overflow-y-auto w-full p-6 space-y-6 shadow-2xl relative my-auto">
             <div className="flex justify-between items-center border-b pb-4">
-              <h2 className="text-xl font-bold text-gray-800">إضافة عقار جديد</h2>
+              <h2 className="text-xl font-bold text-gray-800">
+                {isEditing ? "تعديل العقار" : "إضافة عقار جديد"}
+              </h2>
               <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-600">
                 <X className="w-6 h-6" />
               </button>
@@ -637,7 +743,9 @@ export default function PropertiesPage() {
                   disabled={isSubmitting}
                   className="px-6 py-2 rounded-xl text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-700 transition"
                 >
-                  {isSubmitting ? "جاري الحفظ..." : "حفظ العقار"}
+                  {isSubmitting
+                    ? (isEditing ? "جاري التعديل..." : "جاري الحفظ...")
+                    : (isEditing ? "تعديل العقار" : "حفظ العقار")}
                 </button>
               </div>
             </form>
