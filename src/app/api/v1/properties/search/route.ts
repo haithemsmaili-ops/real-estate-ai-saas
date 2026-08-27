@@ -60,6 +60,9 @@ export async function GET(req: NextRequest) {
           "N/A",
         specs: specsList.join(", ") || "N/A",
         description: p.description || "",
+        latitude: p.latitude,
+        longitude: p.longitude,
+        mapUrl: p.mapUrl,
       };
     });
 

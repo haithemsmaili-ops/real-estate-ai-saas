@@ -14,6 +14,18 @@ import {
   Home,
 } from "lucide-react";
 import { useSession } from "next-auth/react";
+import dynamic from "next/dynamic";
+import PropertyMiniMap from "@/components/dashboard/PropertyMiniMap";
+
+const LocationPickerMap = dynamic(() => import("@/components/dashboard/LocationPickerMap"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-56 bg-gray-50 border border-gray-200 rounded-2xl animate-pulse flex flex-col items-center justify-center text-xs text-gray-400 gap-2">
+      <Building2 className="w-6 h-6 text-gray-300 animate-bounce" />
+      <span>جاري تحميل الخريطة التفاعلية...</span>
+    </div>
+  ),
+});
 
 interface PropertyRecord {
   id: string;
@@ -33,6 +45,9 @@ interface PropertyRecord {
   areaUnit?: string;
   bedrooms?: number;
   bathrooms?: number;
+  latitude?: number;
+  longitude?: number;
+  mapUrl?: string;
   status?: string;
   images?: string[];
 }
@@ -81,6 +96,9 @@ export default function PropertiesPage() {
           areaUnit: item.area_unit || item.areaUnit,
           bedrooms: item.bedrooms,
           bathrooms: item.bathrooms,
+          latitude: item.latitude !== undefined && item.latitude !== null ? Number(item.latitude) : undefined,
+          longitude: item.longitude !== undefined && item.longitude !== null ? Number(item.longitude) : undefined,
+          mapUrl: item.map_url || item.mapUrl,
           status: item.status,
           images: item.images || [],
         }));
@@ -93,7 +111,27 @@ export default function PropertiesPage() {
     }
   };
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    title: string;
+    description: string;
+    listingType: string;
+    propertyType: string;
+    price: string;
+    currency: string;
+    country: string;
+    city: string;
+    district: string;
+    address: string;
+    area: string;
+    areaUnit: string;
+    bedrooms: string;
+    bathrooms: string;
+    legalStatus: string;
+    status: string;
+    latitude?: number;
+    longitude?: number;
+    mapUrl: string;
+  }>({
     title: "",
     description: "",
     listingType: "sale",
@@ -110,6 +148,9 @@ export default function PropertiesPage() {
     bathrooms: "",
     legalStatus: "freehold",
     status: "available",
+    latitude: undefined,
+    longitude: undefined,
+    mapUrl: "",
   });
 
   const handleDelete = async (id: string) => {
@@ -149,6 +190,9 @@ export default function PropertiesPage() {
         bedrooms: Number(formData.bedrooms) || 0,
         bathrooms: Number(formData.bathrooms) || 0,
         location: [formData.district, formData.city, formData.country].filter(Boolean).join(", ") || formData.address || "",
+        latitude: formData.latitude,
+        longitude: formData.longitude,
+        mapUrl: formData.mapUrl,
       };
 
       const res = await fetch("/api/properties", {
@@ -176,6 +220,9 @@ export default function PropertiesPage() {
           bathrooms: "",
           legalStatus: "freehold",
           status: "available",
+          latitude: undefined,
+          longitude: undefined,
+          mapUrl: "",
         });
         fetchProperties(userEmail);
       } else {
@@ -291,6 +338,12 @@ export default function PropertiesPage() {
                     <MapPin className="w-4 h-4 text-emerald-600 shrink-0" />
                     {prop.location || `${prop.city || ""}, ${prop.country || ""}`}
                   </p>
+                  <PropertyMiniMap
+                    latitude={prop.latitude}
+                    longitude={prop.longitude}
+                    mapUrl={prop.mapUrl}
+                    locationName={prop.location}
+                  />
                 </div>
 
                 <div className="text-xl font-extrabold text-emerald-600">
@@ -444,6 +497,23 @@ export default function PropertiesPage() {
                     className="w-full border rounded-xl p-2.5 text-sm outline-none"
                   />
                 </div>
+              </div>
+
+              {/* Map Location Picker */}
+              <div className="pt-2 border-t border-gray-100">
+                <LocationPickerMap
+                  latitude={formData.latitude}
+                  longitude={formData.longitude}
+                  mapUrl={formData.mapUrl}
+                  onLocationSelect={(lat, lng, url) => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      latitude: lat,
+                      longitude: lng,
+                      mapUrl: url || prev.mapUrl,
+                    }));
+                  }}
+                />
               </div>
 
               <div className="grid grid-cols-4 gap-3">

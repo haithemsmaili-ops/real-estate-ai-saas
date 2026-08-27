@@ -56,38 +56,52 @@ export async function POST(request: Request) {
       status,
       images,
       userEmail,
+      latitude,
+      longitude,
+      mapUrl,
+      map_url,
     } = body;
 
     if (!userEmail) {
       return NextResponse.json({ error: "User email is required" }, { status: 400 });
     }
 
+    const insertData: Record<string, unknown> = {
+      title,
+      description,
+      listing_type: listingType,
+      property_type: propertyType,
+      price: String(price),
+      numeric_price: numericPrice,
+      currency,
+      country,
+      city,
+      district,
+      address,
+      location,
+      area,
+      area_unit: areaUnit,
+      bedrooms,
+      bathrooms,
+      legal_status: legalStatus,
+      status,
+      images: images || [],
+      user_email: userEmail,
+    };
+
+    if (latitude !== undefined && latitude !== null && latitude !== "") {
+      insertData.latitude = Number(latitude);
+    }
+    if (longitude !== undefined && longitude !== null && longitude !== "") {
+      insertData.longitude = Number(longitude);
+    }
+    if (mapUrl || map_url) {
+      insertData.map_url = mapUrl || map_url;
+    }
+
     const { data, error } = await supabase
       .from("properties")
-      .insert([
-        {
-          title,
-          description,
-          listing_type: listingType,
-          property_type: propertyType,
-          price: String(price),
-          numeric_price: numericPrice,
-          currency,
-          country,
-          city,
-          district,
-          address,
-          location,
-          area,
-          area_unit: areaUnit,
-          bedrooms,
-          bathrooms,
-          legal_status: legalStatus,
-          status,
-          images: images || [],
-          user_email: userEmail,
-        },
-      ])
+      .insert([insertData])
       .select();
 
     if (error) {

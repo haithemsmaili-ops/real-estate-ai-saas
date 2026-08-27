@@ -41,6 +41,9 @@ export interface PropertyRecord {
   parkingSpaces?: number;
   floorNumber?: number;
   legalStatus?: 'freehold' | 'off_plan' | 'leasehold' | 'pending_verification';
+  latitude?: number;
+  longitude?: number;
+  mapUrl?: string;
   status: 'available' | 'pending' | 'sold' | 'rented';
   amenities?: string[];
   createdAt: string;
@@ -152,6 +155,9 @@ export const jsonDb = {
       bathrooms: p.bathrooms ? Number(p.bathrooms) : undefined,
       area: p.area ? Number(p.area) : undefined,
       areaUnit: p.area_unit || 'sqm',
+      latitude: p.latitude !== null && p.latitude !== undefined ? Number(p.latitude) : undefined,
+      longitude: p.longitude !== null && p.longitude !== undefined ? Number(p.longitude) : undefined,
+      mapUrl: p.map_url || p.mapUrl || undefined,
       status: p.status || 'available',
       createdAt: p.created_at,
     }));
@@ -178,6 +184,9 @@ export const jsonDb = {
     if (property.areaUnit) propertyPayload.area_unit = property.areaUnit;
     if (property.bedrooms) propertyPayload.bedrooms = Number(property.bedrooms);
     if (property.bathrooms) propertyPayload.bathrooms = Number(property.bathrooms);
+    if (property.latitude !== undefined && property.latitude !== null) propertyPayload.latitude = Number(property.latitude);
+    if (property.longitude !== undefined && property.longitude !== null) propertyPayload.longitude = Number(property.longitude);
+    if (property.mapUrl || property.map_url) propertyPayload.map_url = property.mapUrl || property.map_url;
 
     const { data, error } = await supabase
       .from('properties')
