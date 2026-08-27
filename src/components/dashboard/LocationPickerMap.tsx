@@ -143,6 +143,11 @@ export default function LocationPickerMap({
 
         leafletMapRef.current = map;
         markerRef.current = marker;
+
+        // Force Leaflet tile recalculation inside modal viewport
+        setTimeout(() => {
+          map.invalidateSize();
+        }, 250);
       } else {
         // Update marker position & map view if center changed externally
         leafletMapRef.current.setView([currentLat, currentLng], leafletMapRef.current.getZoom() || 13);

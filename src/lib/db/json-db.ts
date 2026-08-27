@@ -164,7 +164,7 @@ export const jsonDb = {
   },
 
   async addProperty(property: any) {
-    const propertyPayload: any = {
+    const basePayload: any = {
       user_email: (property.userEmail || property.user_email || '').toLowerCase(),
       title: property.title || '',
       description: property.description || '',
@@ -176,23 +176,41 @@ export const jsonDb = {
       status: property.status || 'available',
     };
 
-    if (property.numericPrice || property.price) propertyPayload.numeric_price = Number(property.numericPrice || property.price || 0);
-    if (property.city) propertyPayload.city = property.city;
-    if (property.district) propertyPayload.district = property.district;
-    if (property.country) propertyPayload.country = property.country;
-    if (property.area) propertyPayload.area = Number(property.area);
-    if (property.areaUnit) propertyPayload.area_unit = property.areaUnit;
-    if (property.bedrooms) propertyPayload.bedrooms = Number(property.bedrooms);
-    if (property.bathrooms) propertyPayload.bathrooms = Number(property.bathrooms);
-    if (property.latitude !== undefined && property.latitude !== null) propertyPayload.latitude = Number(property.latitude);
-    if (property.longitude !== undefined && property.longitude !== null) propertyPayload.longitude = Number(property.longitude);
-    if (property.mapUrl || property.map_url) propertyPayload.map_url = property.mapUrl || property.map_url;
+    if (property.numericPrice || property.price) basePayload.numeric_price = Number(property.numericPrice || property.price || 0);
+    if (property.city) basePayload.city = property.city;
+    if (property.district) basePayload.district = property.district;
+    if (property.country) basePayload.country = property.country;
+    if (property.area) basePayload.area = Number(property.area);
+    if (property.areaUnit) basePayload.area_unit = property.areaUnit;
+    if (property.bedrooms) basePayload.bedrooms = Number(property.bedrooms);
+    if (property.bathrooms) basePayload.bathrooms = Number(property.bathrooms);
 
-    const { data, error } = await supabase
+    const fullPayload: any = { ...basePayload };
+
+    const parsedLat = property.latitude !== undefined && property.latitude !== null && property.latitude !== "" ? Number(property.latitude) : undefined;
+    const parsedLng = property.longitude !== undefined && property.longitude !== null && property.longitude !== "" ? Number(property.longitude) : undefined;
+
+    if (parsedLat !== undefined && !isNaN(parsedLat)) fullPayload.latitude = parsedLat;
+    if (parsedLng !== undefined && !isNaN(parsedLng)) fullPayload.longitude = parsedLng;
+    if (property.mapUrl || property.map_url) fullPayload.map_url = String(property.mapUrl || property.map_url);
+
+    let { data, error } = await supabase
       .from('properties')
-      .insert([propertyPayload])
+      .insert([fullPayload])
       .select()
       .single();
+
+    if (error && (error.code === "PGRST204" || /column|latitude|longitude|map_url/i.test(error.message))) {
+      console.warn("[Supabase Insert Warning]: Retrying property insertion without geospatial fields...", error.message);
+      const fallbackRes = await supabase
+        .from('properties')
+        .insert([basePayload])
+        .select()
+        .single();
+
+      data = fallbackRes.data;
+      error = fallbackRes.error;
+    }
 
     if (error) {
       console.error("[Supabase Insert Error]:", error);
