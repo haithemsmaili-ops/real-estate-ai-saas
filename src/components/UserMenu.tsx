@@ -77,7 +77,7 @@ export function UserMenu({ locale }: UserMenuProps) {
 
             {/* القائمة المنسدلة Dropdown */}
             {isOpen && (
-                <div className="absolute left-0 sm:right-0 sm:left-auto mt-2 w-56 origin-top-right rounded-2xl border border-surface-200 bg-white p-2 shadow-xl z-50 transition-all">
+                <div className="absolute right-0 mt-2 w-56 origin-top-right rounded-2xl border border-surface-200 bg-white p-2 shadow-xl z-50 transition-all">
                     <div className="border-b border-surface-100 px-3 py-2.5">
                         <p className="truncate text-sm font-bold text-surface-900">{name}</p>
                         <p className="truncate text-xs text-surface-500">{email}</p>

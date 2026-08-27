@@ -230,7 +230,7 @@ export function PricingSection({ dict, locale }: PricingProps) {
             onClick={() => setSelectedPlan(null)}
           />
 
-          <div className="relative bg-surface-900/95 backdrop-blur-2xl rounded-3xl shadow-[0_20px_70px_rgba(0,0,0,0.7)] w-full max-w-2xl overflow-hidden animate-fade-in-scale z-10 my-8 border border-white/15">
+          <div className="relative bg-surface-900/95 backdrop-blur-2xl rounded-3xl shadow-[0_20px_70px_rgba(0,0,0,0.7)] w-full max-w-2xl overflow-y-auto max-h-[90vh] animate-fade-in-scale z-10 my-auto border border-white/15">
             {/* Ambient inner glow */}
             <div className="pointer-events-none absolute -top-20 end-0 h-64 w-64 rounded-full bg-emerald-500/20 blur-[90px]" />
 

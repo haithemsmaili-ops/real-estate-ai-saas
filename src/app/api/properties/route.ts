@@ -99,8 +99,9 @@ export async function POST(request: Request) {
       bathrooms: parsedBathrooms,
       legal_status: body.legalStatus || body.legal_status || "freehold",
       status: body.status || "available",
-      images: cleanImages,
-      videos: cleanVideos,
+      // Always pass arrays — prevents DB null default for videos column
+      images: Array.isArray(cleanImages) ? cleanImages : [],
+      videos: Array.isArray(cleanVideos) ? cleanVideos : [],
       user_email: String(userEmail).toLowerCase().trim(),
     };
 
@@ -118,10 +119,11 @@ export async function POST(request: Request) {
       .insert([fullInsertData])
       .select();
 
-    // Fallback 1: Retrying without geospatial columns if schema missing lat/lng
+    // Fallback 1: Retrying WITHOUT geospatial columns if schema is missing lat/lng/map_url
+    // NOTE: baseInsertData still contains images/videos — they are preserved here!
     if (error && (error.code === "PGRST204" || /column|latitude|longitude|map_url/i.test(error.message))) {
       console.warn(
-        "Supabase properties table missing geospatial columns. Retrying insertion with base schema fallback...",
+        "Supabase properties table missing geospatial columns. Retrying insertion with base schema (images/videos preserved)...",
         error.message
       );
 
@@ -134,14 +136,14 @@ export async function POST(request: Request) {
       error = fallbackRes.error;
     }
 
-    // Fallback 2: Retrying without images/videos columns if DB missing array columns
+    // Fallback 2: Retrying WITHOUT images/videos columns if DB is missing array columns
     if (error && (error.code === "PGRST204" || /images|videos/i.test(error.message))) {
       console.warn(
-        "Supabase properties table missing media array columns. Retrying insertion with minimal base payload...",
+        "Supabase properties table missing media array columns. Retrying insertion with minimal payload...",
         error.message
       );
 
-      const minimalData = { ...baseInsertData };
+      const minimalData: Record<string, unknown> = { ...baseInsertData };
       delete minimalData.images;
       delete minimalData.videos;
 

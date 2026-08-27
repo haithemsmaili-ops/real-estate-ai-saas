@@ -11,10 +11,14 @@ import {
   Maximize,
   Trash2,
   Pencil,
+  Eye,
   X,
   Home,
   Camera,
   Film,
+  DollarSign,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
@@ -70,8 +74,10 @@ export default function PropertiesPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingPropertyId, setEditingPropertyId] = useState<string | null>(null);
+  const [viewingProperty, setViewingProperty] = useState<PropertyRecord | null>(null);
+  const [viewImageIndex, setViewImageIndex] = useState(0);
 
-  useScrollLock(isModalOpen);
+  useScrollLock(isModalOpen || !!viewingProperty);
 
   const userEmail = session?.user?.email || null;
 
@@ -432,9 +438,16 @@ export default function PropertiesPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProperties.map((prop) => (
-            <div key={prop.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition overflow-hidden flex flex-col justify-between group">
-              {/* Cover Image Header */}
-              {prop.images && prop.images.length > 0 ? (
+            <div
+              key={prop.id}
+              className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition overflow-hidden flex flex-col justify-between group"
+            >
+              {/* Cover Image Header - Clickable to open detail view */}
+              <div
+                className="cursor-pointer"
+                onClick={() => { setViewingProperty(prop); setViewImageIndex(0); }}
+              >
+                {prop.images && prop.images.length > 0 ? (
                 <div className="relative h-48 w-full overflow-hidden bg-gray-100">
                   <img
                     src={prop.images[0]}
@@ -454,13 +467,18 @@ export default function PropertiesPage() {
                     )}
                   </div>
                 </div>
-              ) : (
-                <div className="relative h-32 w-full bg-gradient-to-br from-emerald-500/10 via-teal-500/10 to-cyan-500/10 flex items-center justify-center">
-                  <Building2 className="w-10 h-10 text-emerald-600/30" />
-                </div>
-              )}
+                ) : (
+                  <div className="relative h-32 w-full bg-gradient-to-br from-emerald-500/10 via-teal-500/10 to-cyan-500/10 flex items-center justify-center">
+                    <Building2 className="w-10 h-10 text-emerald-600/30" />
+                  </div>
+                )}
+              </div>
 
-              <div className="p-5 space-y-4">
+              {/* Card body - also clickable */}
+              <div
+                className="p-5 space-y-4 cursor-pointer"
+                onClick={() => { setViewingProperty(prop); setViewImageIndex(0); }}
+              >
                 <div className="flex justify-between items-start gap-2">
                   <span className={`px-3 py-1 rounded-full text-xs font-semibold ${prop.status === "available" ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600"}`}>
                     {prop.status === "available" ? "متاح" : prop.status}
@@ -504,18 +522,26 @@ export default function PropertiesPage() {
                 </div>
               </div>
 
+              {/* Card Footer: property type + action buttons */}
               <div className="p-4 bg-gray-50 border-t border-gray-100 flex justify-between items-center">
                 <span className="text-xs text-gray-400 capitalize">{prop.propertyType || "شقة"}</span>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5">
                   <button
-                    onClick={() => handleEditClick(prop)}
+                    onClick={(e) => { e.stopPropagation(); setViewingProperty(prop); setViewImageIndex(0); }}
+                    className="text-gray-500 hover:text-blue-600 p-1.5 rounded-lg hover:bg-blue-50 transition"
+                    title="عرض تفاصيل العقار"
+                  >
+                    <Eye className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleEditClick(prop); }}
                     className="text-gray-500 hover:text-emerald-600 p-1.5 rounded-lg hover:bg-gray-100 transition"
                     title="تعديل العقار"
                   >
                     <Pencil className="w-4 h-4" />
                   </button>
                   <button
-                    onClick={() => handleDelete(prop.id)}
+                    onClick={(e) => { e.stopPropagation(); handleDelete(prop.id); }}
                     className="text-red-500 hover:text-red-700 p-1.5 rounded-lg hover:bg-red-50 transition"
                     title="حذف العقار"
                   >
@@ -528,7 +554,184 @@ export default function PropertiesPage() {
         </div>
       )}
 
-      {/* Modal Form */}
+      {/* ============ Property Detail View Modal ============ */}
+      {viewingProperty && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-start justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-2xl w-full shadow-2xl relative my-8 overflow-hidden">
+            {/* Header */}
+            <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100">
+              <h2 className="text-xl font-bold text-gray-800 line-clamp-1">{viewingProperty.title}</h2>
+              <button
+                onClick={() => setViewingProperty(null)}
+                className="text-gray-400 hover:text-gray-700 p-1.5 rounded-lg hover:bg-gray-100 transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Image Gallery */}
+            {viewingProperty.images && viewingProperty.images.length > 0 ? (
+              <div className="relative h-64 w-full bg-gray-100 overflow-hidden">
+                <img
+                  src={viewingProperty.images[viewImageIndex]}
+                  alt={viewingProperty.title}
+                  className="w-full h-full object-cover"
+                />
+                {viewingProperty.images.length > 1 && (
+                  <>
+                    <button
+                      onClick={() => setViewImageIndex((i) => (i - 1 + viewingProperty.images!.length) % viewingProperty.images!.length)}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-1.5 rounded-full transition"
+                    >
+                      <ChevronLeft className="w-5 h-5" />
+                    </button>
+                    <button
+                      onClick={() => setViewImageIndex((i) => (i + 1) % viewingProperty.images!.length)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-1.5 rounded-full transition"
+                    >
+                      <ChevronRight className="w-5 h-5" />
+                    </button>
+                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+                      {viewingProperty.images.map((_, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => setViewImageIndex(idx)}
+                          className={`w-2 h-2 rounded-full transition ${idx === viewImageIndex ? 'bg-white' : 'bg-white/40'}`}
+                        />
+                      ))}
+                    </div>
+                  </>
+                )}
+                <div className="absolute top-3 right-3 flex gap-1.5">
+                  <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-black/60 text-white flex items-center gap-1">
+                    <Camera className="w-3.5 h-3.5 text-emerald-400" />
+                    {viewingProperty.images.length}
+                  </span>
+                  {viewingProperty.videos && viewingProperty.videos.length > 0 && (
+                    <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-black/60 text-white flex items-center gap-1">
+                      <Film className="w-3.5 h-3.5 text-cyan-400" />
+                      {viewingProperty.videos.length}
+                    </span>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="h-32 w-full bg-gradient-to-br from-emerald-500/10 via-teal-500/10 to-cyan-500/10 flex items-center justify-center">
+                <Building2 className="w-10 h-10 text-emerald-600/30" />
+              </div>
+            )}
+
+            {/* Body */}
+            <div className="p-6 space-y-5" dir="rtl">
+              {/* Status badges */}
+              <div className="flex gap-2 flex-wrap">
+                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                  viewingProperty.status === 'available' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'
+                }`}>
+                  {viewingProperty.status === 'available' ? 'متاح' : viewingProperty.status}
+                </span>
+                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 capitalize">
+                  {viewingProperty.listingType === 'sale' ? 'للبيع' : viewingProperty.listingType === 'rent' ? 'للإيجار' : viewingProperty.listingType}
+                </span>
+                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 capitalize">
+                  {viewingProperty.propertyType}
+                </span>
+              </div>
+
+              {/* Price */}
+              <div className="flex items-center gap-2">
+                <DollarSign className="w-5 h-5 text-emerald-600 shrink-0" />
+                <span className="text-2xl font-extrabold text-emerald-600">
+                  {viewingProperty.numericPrice ? viewingProperty.numericPrice.toLocaleString() : viewingProperty.price}{' '}
+                  {viewingProperty.currency || 'USD'}
+                </span>
+              </div>
+
+              {/* Location */}
+              {(viewingProperty.location || viewingProperty.city || viewingProperty.country) && (
+                <div className="flex items-start gap-2 text-sm text-gray-600">
+                  <MapPin className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <span>{viewingProperty.location || [viewingProperty.district, viewingProperty.city, viewingProperty.country].filter(Boolean).join(', ')}</span>
+                </div>
+              )}
+
+              {/* Stats grid */}
+              <div className="grid grid-cols-3 gap-3 p-4 bg-gray-50 rounded-xl">
+                <div className="flex flex-col items-center gap-1">
+                  <Bed className="w-5 h-5 text-gray-400" />
+                  <span className="text-base font-bold text-gray-800">{viewingProperty.bedrooms ?? 0}</span>
+                  <span className="text-[11px] text-gray-500">غرف</span>
+                </div>
+                <div className="flex flex-col items-center gap-1">
+                  <Bath className="w-5 h-5 text-gray-400" />
+                  <span className="text-base font-bold text-gray-800">{viewingProperty.bathrooms ?? 0}</span>
+                  <span className="text-[11px] text-gray-500">حمام</span>
+                </div>
+                <div className="flex flex-col items-center gap-1">
+                  <Maximize className="w-5 h-5 text-gray-400" />
+                  <span className="text-base font-bold text-gray-800">{viewingProperty.area ?? 0}</span>
+                  <span className="text-[11px] text-gray-500">{viewingProperty.areaUnit === 'sqft' ? 'SqFt' : 'م²'}</span>
+                </div>
+              </div>
+
+              {/* Description */}
+              {viewingProperty.description && (
+                <div className="text-sm text-gray-600 leading-relaxed border-t pt-4">
+                  <p className="font-semibold text-gray-700 mb-1">الوصف:</p>
+                  <p>{viewingProperty.description}</p>
+                </div>
+              )}
+
+              {/* Videos */}
+              {viewingProperty.videos && viewingProperty.videos.length > 0 && (
+                <div className="border-t pt-4">
+                  <p className="text-xs font-bold text-gray-600 mb-2 flex items-center gap-1.5">
+                    <Film className="w-3.5 h-3.5 text-cyan-600" />
+                    فيديوهات العقار ({viewingProperty.videos.length}):
+                  </p>
+                  <div className="space-y-1.5">
+                    {viewingProperty.videos.map((vid, idx) => (
+                      <a
+                        key={idx}
+                        href={vid}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-xs text-cyan-700 bg-cyan-50 hover:bg-cyan-100 border border-cyan-100 p-2 rounded-xl transition truncate"
+                      >
+                        <Film className="w-3.5 h-3.5 shrink-0" />
+                        <span className="truncate font-mono">{vid}</span>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Footer actions */}
+            <div className="px-6 pb-6 flex gap-3 justify-end border-t pt-4" dir="rtl">
+              <button
+                onClick={() => setViewingProperty(null)}
+                className="px-4 py-2 rounded-xl text-sm font-medium border border-gray-200 hover:bg-gray-50 transition"
+              >
+                إغلاق
+              </button>
+              <button
+                onClick={() => {
+                  const p = viewingProperty;
+                  setViewingProperty(null);
+                  handleEditClick(p);
+                }}
+                className="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-semibold bg-emerald-600 text-white hover:bg-emerald-700 transition"
+              >
+                <Pencil className="w-4 h-4" />
+                تعديل العقار
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============ Add / Edit Property Modal Form ============ */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-2xl max-h-[90vh] overflow-y-auto w-full p-6 space-y-6 shadow-2xl relative my-auto">

@@ -66,8 +66,9 @@ async function handleUpdate(
       bathrooms: body.bathrooms !== undefined ? parsedBathrooms : undefined,
       legal_status: body.legalStatus || body.legal_status,
       status: body.status,
-      images: body.images !== undefined ? cleanImages : undefined,
-      videos: body.videos !== undefined ? cleanVideos : undefined,
+      // Always store arrays — guarantees videos column never stays null
+      images: body.images !== undefined ? (Array.isArray(body.images) ? body.images : []) : undefined,
+      videos: body.videos !== undefined ? (Array.isArray(body.videos) ? body.videos : []) : undefined,
     };
 
     // Remove undefined values to construct a clean patch/update payload
