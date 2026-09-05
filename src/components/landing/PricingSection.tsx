@@ -35,12 +35,12 @@ export function PricingSection({ dict, locale }: PricingProps) {
     {
       key: "growth",
       icon: <Crown className="w-6 h-6 text-amber-400" />,
-      popular: true,
+      popular: false,
     },
     {
       key: "premium",
       icon: <Building2 className="w-6 h-6 text-cyan-400" />,
-      popular: false,
+      popular: true,
     },
     {
       key: "enterprise",

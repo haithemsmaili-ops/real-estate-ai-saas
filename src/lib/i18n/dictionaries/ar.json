@@ -79,7 +79,7 @@
       },
       "growth": {
         "name": "2. Growth Agent",
-        "badge": "الأكثر إقبالاً 🚀",
+        "badge": null,
         "anchorSetup": "$399",
         "anchorMonthly": "$550/شهرياً",
         "setupPrice": "$199",
@@ -99,7 +99,7 @@
       },
       "premium": {
         "name": "3. Premium Omnichannel",
-        "badge": "عائد استثمار عالي 🔥",
+        "badge": "الأكثر إقبالاً 🚀",
         "anchorSetup": "$599",
         "anchorMonthly": "$1,099/شهرياً",
         "setupPrice": "$299",

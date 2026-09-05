@@ -79,7 +79,7 @@
       },
       "growth": {
         "name": "2. Growth Agent",
-        "badge": "Most Popular 🚀",
+        "badge": null,
         "anchorSetup": "$399",
         "anchorMonthly": "$550/mo",
         "setupPrice": "$199",
@@ -99,7 +99,7 @@
       },
       "premium": {
         "name": "3. Premium Omnichannel",
-        "badge": "High ROI Choice 🔥",
+        "badge": "Most Popular 🚀",
         "anchorSetup": "$599",
         "anchorMonthly": "$1,099/mo",
         "setupPrice": "$299",
