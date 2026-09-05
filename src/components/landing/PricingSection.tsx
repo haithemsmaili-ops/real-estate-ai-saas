@@ -135,9 +135,14 @@ export function PricingSection({ dict, locale }: PricingProps) {
                   <div className="my-4 p-4 rounded-2xl bg-gradient-to-br from-white/[0.04] to-emerald-950/20 border border-white/10">
                     {/* Setup Fee */}
                     <div className="flex flex-col mb-2.5 pb-2.5 border-b border-white/10">
-                      <span className="text-[11px] uppercase tracking-wider font-semibold text-surface-400">
-                        {dict?.pricing?.setupLabel || (isRTL ? "رسوم إعداد" : "Setup Fee")}
-                      </span>
+                      <div className="flex items-center justify-between gap-1">
+                        <span className="text-[11px] uppercase tracking-wider font-semibold text-surface-400">
+                          {dict?.pricing?.setupLabel || (isRTL ? "رسوم الإعداد لأول مرة" : "One-Time Setup Fee")}
+                        </span>
+                        <span className="text-[10px] font-medium text-emerald-400/90 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 whitespace-nowrap">
+                          {isRTL ? "مرة واحدة" : "One-time"}
+                        </span>
+                      </div>
                       <div className="flex items-baseline gap-2 mt-1">
                         <span className="text-2xl font-extrabold bg-gradient-to-r from-emerald-400 to-teal-300 bg-clip-text text-transparent">
                           {planData.setupPrice}
@@ -265,10 +270,15 @@ export function PricingSection({ dict, locale }: PricingProps) {
               {/* Price breakdown box with Anchor Prices */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 p-5 bg-gradient-to-br from-white/[0.04] to-emerald-950/30 rounded-2xl border border-emerald-500/20">
                 <div>
-                  <span className="text-xs uppercase tracking-wider font-semibold text-emerald-400 block mb-1">
-                    {dict?.pricing?.setupLabel || (isRTL ? "رسوم الإعداد (مرة واحدة)" : "One-Time Setup Fee")}
-                  </span>
-                  <div className="flex items-baseline gap-2">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs uppercase tracking-wider font-semibold text-emerald-400 block">
+                      {dict?.pricing?.setupLabel || (isRTL ? "رسوم الإعداد لأول مرة" : "One-Time Setup Fee")}
+                    </span>
+                    <span className="text-[10px] font-semibold text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded-full border border-emerald-500/30">
+                      {isRTL ? "تدفع مرة واحدة فقط" : "One-time fee"}
+                    </span>
+                  </div>
+                  <div className="flex items-baseline gap-2 mt-1">
                     <span className="text-3xl font-extrabold bg-gradient-to-r from-emerald-400 to-teal-300 bg-clip-text text-transparent">
                       {activePlan.setupPrice}
                     </span>
